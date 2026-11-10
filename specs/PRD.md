@@ -1,5 +1,5 @@
 # PRD — MVZ El-Sharafi: Anwesenheit & Urlaub
-**Version:** 1.2 · **Date:** 2026-11-10 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
+**Version:** 1.3 · **Date:** 2026-11-10 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
 
 | Document | Contents |
 |---|---|
@@ -95,4 +95,5 @@ Print view, blackout periods, a second language, approval for sick days, rotatin
 | 1.0 | 2026-11-10 | First PRD, from the planning sessions, the screenshots of the current app, and the competitor comparison |
 | 1.1 | 2026-11-10 | First login via invite link (email/QR), self-service reset, no admin-set passwords |
 | 1.2 | 2026-11-10 | Settings page with feature switches; admin-managed absence types; new types Bildungsurlaub, Sonderurlaub subtypes, Unbezahlter Urlaub, Elternzeit, Mutterschutz; admin range entry |
+| 1.3 | 2026-11-10 | UI design direction "pencil and ink" (design.md §11), "Sie" voice, clickable prototype before T11 |
 

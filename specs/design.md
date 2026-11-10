@@ -146,3 +146,52 @@ node scripts/import-praxisplan.mjs <file> [--dry-run]
   - Skip or delete a failing test.
   - Build anything that isn't in the specs.
 
+
+## 11. UI design — "pencil and ink"
+**The idea:** a paper duty roster is pencilled in first and inked once it's confirmed. The app does the same:
+- **Pending entries** are pencil: Bleistift grey, a dashed outline, the letter in grey.
+- **Approved entries** are ink: a solid round stamp in the type's colour.
+
+This is the one bold visual element. Everything else stays quiet.
+
+**Second motif:** the MVZ appointment card's "Mo Di Mi Do Fr" circles. Each person's working weekdays show as 5 small circles, filled on the days they work. They appear in the grid's name column and on the phone page.
+
+**Colour tokens** (the old app's meanings are kept: red X, blue U, yellow today, red holidays):
+| Token | Hex | Use |
+|---|---|---|
+| `paper` | `#F6F8F7` | Page background |
+| `ink` | `#1D2B34` | Text, approved outlines |
+| `krank` | `#C42F2A` | X/K stamps; holiday columns as a pale tint |
+| `urlaub` | `#2446A6` | U/B stamps |
+| `marker` | `#FFE14D` | Today's column, like a highlighter |
+| `pencil` | `#8C959B` | Pending entries, gridlines, secondary text |
+
+Other types use muted inks (green `#2F7A55`, violet `#6A4C9C`, brown `#8A5A2B`, slate `#4F6470`), set per type in `absence_types.color`. A dark theme inverts paper and ink and keeps the stamp colours, lightened for contrast.
+
+**Type:**
+- Atkinson Hyperlegible Next (Google Fonts) only, chosen for legibility across mixed language backgrounds.
+- Tabular figures in the grid.
+- The month title is large and set slightly tight.
+- No all-caps labels, no monospace, sentence case everywhere.
+
+**Layout:**
+- **Admin:** one continuous ruled sheet; no cards. The name column is sticky and holds the weekday circles plus the X / U / Rest counts. A week line follows each Friday, and the month start is marked. "Offene Anträge" opens as a drawer from the right, so the grid keeps its width.
+- **Staff (phone first):**
+  - A plain sentence, "Sie haben noch 14 Urlaubstage", with "beantragt" and "genommen" beneath it.
+  - The weekday circles.
+  - Two buttons: "Urlaub beantragen" and "Krank melden".
+  - A month calendar and "Meine Anträge".
+
+**Voice:**
+- Staff are addressed as **"Sie"**.
+- Buttons say exactly what they do ("Urlaub beantragen", "Genehmigen"). The matching confirmation uses the same word ("Beantragt", "Genehmigt").
+- Errors say what's wrong and how to fix it, with no apology.
+
+**Quality floor:**
+- WCAG AA contrast.
+- Visible keyboard focus. The grid can be operated by keyboard: arrow keys move between cells, Space cycles the entry, and the context-menu key opens the menu.
+- The state never relies on colour alone: the letter and the dashed or solid style carry it too.
+- `prefers-reduced-motion` is respected.
+- The only motion is the stamp "press" when an entry is approved.
+
+**Prototype:** a clickable static prototype (sample data, no backend) is published at https://claude.ai/artifact/PZ7XnNNYahLBTWHsnsLjdK (private). Feedback on it goes back into this section before T11.
