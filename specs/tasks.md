@@ -28,7 +28,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T7 Closures & AU** (Req R16, R17)
   - Work: `closure_days`, `set_closure`, `set_au`, `missing_au`.
   - Verify: pgTAP: closure is safe to repeat, conflicts are listed; a 4-day run without AU is listed
-- [ ] **T7b Settings, types & range entry in SQL** (Req R24, R25, R26)
+- [x] **T7b Settings, types & range entry in SQL** (Req R24, R25, R26)
   - Work: switch checks inside the functions from T3–T7, `save_absence_type`, `delete_absence_type`, `type_usage`, `set_absence_range`, `clear_absence_range`.
   - Verify: pgTAP: each switch off → its function rejects or returns nothing, and on again → the old data is back. A hidden type is rejected but old entries still count. A fixed type can't be hidden. A type in use can't be deleted. Bildungsurlaub over 10 days in 2 years produces a warning. A range entry skips non-working and already-taken days.
 - [ ] **T8 Retention & cron** (Req R15, R20)
