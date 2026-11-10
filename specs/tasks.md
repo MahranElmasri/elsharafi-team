@@ -36,7 +36,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
   - Verify: pgTAP: the purge removes 2022 sick days and keeps vacation
 
 ## Phase C — App
-- [ ] **T9 Auth shell** (Req R1)
+- [x] **T9 Auth shell** (Req R1)
   - Work: `lib/supabase/*`, `middleware.ts`, `/login` (username → Auth-email lookup, one generic error), layout, `scripts/create-admin.mjs`. The script sets the first admin's password directly; this is the bootstrap only, before any admin exists to send invites.
   - Verify: e2e: log in and out; a deactivated user is blocked
 - [ ] **T9b Invites & reset** (Req R23)

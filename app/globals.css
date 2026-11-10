@@ -68,3 +68,35 @@ body {
   outline: 3px solid var(--urlaub);
   outline-offset: 2px;
 }
+
+/* Form controls: quiet ruled fields, one ink button. */
+@layer components {
+  .field {
+    border: 1px solid var(--pencil);
+    border-radius: 6px;
+    background: var(--sheet);
+    padding: 0.65rem 0.75rem;
+    font-size: 1rem;
+  }
+  .field:focus-visible {
+    border-color: var(--urlaub);
+  }
+  .btn-ink {
+    border-radius: 6px;
+    background: var(--ink);
+    color: var(--on-ink);
+    padding: 0.7rem 1rem;
+    font-weight: 700;
+  }
+  .btn-ink:disabled {
+    opacity: 0.6;
+  }
+  .btn-plain {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    color: var(--ink-2);
+  }
+  .btn-plain:hover {
+    color: var(--ink);
+  }
+}

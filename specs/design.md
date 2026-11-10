@@ -18,7 +18,8 @@ Browser ──(Server Components / Server Actions)──► Next.js ──(RPC, 
    └──────────────────────────────────────────────────┘ service-role (server-only): user create/ban/delete
 pg_cron ─► retention purge (SQL)  ·  pg_net ─► POST {APP_URL}/api/cron/reminders (CRON_SECRET)
 ```
-- **Accounts:** public sign-up is disabled (`enable_signup = false` locally; the same switch must be off in the production dashboard). Accounts are created only through the admin API.
+- **Accounts:** public sign-up is disabled (`[auth] enable_signup = false` locally; "Allow new users to sign up" must be off in the production dashboard). `[auth.email] enable_signup` stays `true`: switching it off disables email+password login entirely. Accounts are created only through the admin API. The admin API writes `app_metadata` after inserting the user, so a second trigger (`sync_profile_role`) copies `app_metadata.role` into `profiles.role` whenever it changes.
+- **Sessions:** `middleware.ts` refreshes the session and sends signed-out visitors to `/login` (public paths: `/login`, `/einladung`, `/passwort-vergessen`, `/api/cron`). Every protected page calls `requireUser(role?)` (`lib/session.ts`), which signs out deactivated accounts and sends them to `/login?gesperrt=1`.
 - **Login:**
   - The Auth email is the person's real email when they have one, otherwise `<username>@users.mvz-elsharafi.invalid`.
   - Login always takes the username. A server action looks up the Auth email with the service role and returns one generic error for any failure.
@@ -119,12 +120,14 @@ Tests are written red → green, alongside each task. A failing test is never de
 ```bash
 npm run dev | build | lint | format | typecheck
 npm test                 # vitest run
-npm run test:e2e         # playwright (local Supabase + dev server)
+npm run test:e2e         # playwright (local Supabase + dev server; runs in the installed Google Chrome,
+                         #   because Playwright's Chromium does not support macOS 13)
 npx supabase start       # local stack (Docker)
 npx supabase test db     # pgTAP
 npx supabase db reset    # re-apply migrations + seed locally
 npx supabase db push --db-url "$SUPABASE_DB_URL"   # production — ask first
-node scripts/create-admin.mjs <username> "<Name>" <password>
+node --env-file=.env.local scripts/create-admin.mjs <username> "<Name>" <password> [email]
+# Local development reads .env.local (keys from `npx supabase status -o env`), which overrides .env.
 node scripts/import-praxisplan.mjs <file> [--dry-run]
 ```
 
