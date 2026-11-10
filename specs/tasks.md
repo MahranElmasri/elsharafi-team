@@ -5,7 +5,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T0 Scaffold**
   - Work: `create-next-app` (TS, Tailwind, App Router, ESLint); add Prettier, Vitest, Playwright; `supabase init`; npm scripts.
   - Verify: `npm run build && npm run lint && npm test`
-- [ ] **T1 Core schema** (Req R1, R3, R19, R24, R25)
+- [x] **T1 Core schema** (Req R1, R3, R19, R24, R25)
   - Work: `teams`, `absence_types` (with the fixed-type trigger and the 15 seeded types), `app_settings`, `profiles` + trigger, `is_admin`, base RLS, seed.
   - Verify: `npx supabase test db` (RLS: employee reads only their own profile)
 - [ ] **T2 Calendar** (Req R5, R6)

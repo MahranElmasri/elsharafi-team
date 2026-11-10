@@ -18,6 +18,7 @@ Browser ──(Server Components / Server Actions)──► Next.js ──(RPC, 
    └──────────────────────────────────────────────────┘ service-role (server-only): user create/ban/delete
 pg_cron ─► retention purge (SQL)  ·  pg_net ─► POST {APP_URL}/api/cron/reminders (CRON_SECRET)
 ```
+- **Accounts:** public sign-up is disabled (`enable_signup = false` locally; the same switch must be off in the production dashboard). Accounts are created only through the admin API.
 - **Login:**
   - The Auth email is the person's real email when they have one, otherwise `<username>@users.mvz-elsharafi.invalid`.
   - Login always takes the username. A server action looks up the Auth email with the service role and returns one generic error for any failure.
@@ -81,7 +82,7 @@ app/actions.ts                 → server actions: RPC → email → revalidate
 components/                    → AttendanceGrid, PersonView, YearCalendar, RequestList,
                                  PendingRequests, MissingAu, NotificationBell
 lib/supabase/{server,browser,admin}.ts · lib/mail.ts · lib/settings.ts (reads app_settings + visible types for the UI) · lib/invites.ts (create / hash / redeem) · lib/dates.ts · lib/labels.ts (German text)
-supabase/migrations/ · supabase/seed.sql · supabase/tests/ (pgTAP)
+supabase/migrations/ (schema + reference data: teams, absence types, settings row) · supabase/seed.sql (local test users only) · supabase/tests/ (pgTAP)
 tests/ (Vitest) · e2e/ (Playwright) · scripts/ (create-admin, import-praxisplan) · specs/
 ```
 
