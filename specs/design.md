@@ -1,0 +1,136 @@
+# Design — MVZ El-Sharafi: Anwesenheit & Urlaub
+
+## 1. Principles
+- **The database owns every rule:** counting, balances, conflicts, permissions and notification rows. Next.js renders pages, calls RPCs and sends email.
+- **Day-based model:** one row per person and day. A rule only applies when a row is written, so a later pattern change never changes history.
+- **No direct writes:** RLS is on everywhere, and writes go only through RPCs.
+
+## 2. Tech stack
+- Next.js 15 (App Router, Server Actions), React 19, TypeScript (strict), Tailwind CSS 4
+- Supabase: Postgres 17, Auth, RLS, Realtime (notifications only), `pg_cron`, `pg_net`
+- `@supabase/ssr`, `@supabase/supabase-js`, `nodemailer`, `exceljs`, `qrcode`
+- Dev tools: Supabase CLI (`npx`), Vitest, Playwright, ESLint, Prettier · Node 24
+
+## 3. Architecture
+```
+Browser ──(Server Components / Server Actions)──► Next.js ──(RPC, user JWT)──► Postgres (RLS + functions)
+   ▲  Realtime: notifications only                    │ nodemailer ──► Practice SMTP
+   └──────────────────────────────────────────────────┘ service-role (server-only): user create/ban/delete
+pg_cron ─► retention purge (SQL)  ·  pg_net ─► POST {APP_URL}/api/cron/reminders (CRON_SECRET)
+```
+- **Login:**
+  - The Auth email is the person's real email when they have one, otherwise `<username>@users.mvz-elsharafi.invalid`.
+  - Login always takes the username. A server action looks up the Auth email with the service role and returns one generic error for any failure.
+  - Changing someone's email also updates their Auth email (`auth.admin.updateUserById`).
+- **Invites & reset (R23):**
+  - The token is 32 random bytes in base64url. Only its sha256 hash is stored in `invite_tokens`.
+  - Creating a token marks all of that person's older unused tokens as used.
+  - Redeem: look up `token_hash`, then run an atomic `update … set used_at = now() where used_at is null and expires_at > now() returning user_id`. Check that the profile is active, set the password with `auth.admin.updateUserById`, sign in, and redirect to `/me` or `/admin`.
+  - "Passwort vergessen" uses the same mechanism (`purpose = reset`): the link is sent by nodemailer, at most 1 per 15 minutes per person, and the page always gives the same answer.
+
+## 4. Data model (`supabase/migrations`)
+| Table | Key columns | Notes |
+|---|---|---|
+| `teams` | `id` (arbeiter / aerzte / verwaltung), `name`, `sort`, `max_absent` | Seeded |
+| `absence_types` | `code`, `letter`, `label`, `color`, `deducts_vacation`, `needs_approval`, `is_health` | Seeded with the 7 types |
+| `profiles` | `id` → `auth.users`, `username` (unique), `full_name`, `notify_email?`, `role`, `team_id`, `active`, `workdays smallint[]`, `start_date`, `end_date?`, `sort` | Created by a trigger on `auth.users`. `role` comes from `app_metadata`. |
+| `leave_allowances` | PK `(user_id, year)`, `days numeric(4,1)`, `carryover numeric(4,1)` | |
+| `leave_requests` | `id`, `user_id` (restrict), `type`, `start_date`, `end_date`, `start_half`, `end_half`, `substitute_id?`, `note`, `status`, `decided_by/at`, `decision_note` | |
+| `absence_days` | PK `(user_id, day)`, `type`, `amount` (1 / 0.5), `half?`, `status` (pending / approved), `request_id?`, `au_received`, `created_by` | A trigger rejects non-working days. FK `user_id` is restrict, so the database itself blocks deleting employees who have entries. |
+| `closure_days` | PK `day`, `note` | |
+| `day_notes` | PK `(user_id, day)`, `note` | |
+| `notifications` | `id`, `user_id`, `message`, `link`, `read_at`, `created_at` | Realtime publication |
+| `audit_log` | `id`, `actor`, `table_name`, `row_key`, `action`, `old`, `new`, `at` | Written by triggers; admins can read it |
+| `invite_tokens` | `id`, `user_id` (cascade), `token_hash` (sha256, unique), `purpose` (invite / reset), `expires_at`, `used_at?`, `created_by?`, `created_at` | RLS on with no policies: service role only |
+| `reminder_log` | `user_id`, `kind`, `year`, `days_at_risk`, `sent_at`, `channel` | Proof of the employer notice |
+
+## 5. Functions
+All functions use `set search_path = public`, revoke `anon`, and run an explicit `is_admin()` or owner check. Errors are raised as German messages.
+
+- **Calendar:** `berlin_holidays(year)` (Gauss/Meeus) · `person_workdays(user, a, b)`
+- **Allowance:** `suggested_allowance(user, year, fulltime_days)` · `balances(year, as_of)` (security invoker; includes carry-over expiry)
+- **Writes:**
+  - `set_absence(user, day, type|null, half|null)` (admin)
+  - `report_absence(type, a, b, note)` (employee)
+  - `request_leave(...)`, `decide_leave(id, approve, note)` (uses `FOR UPDATE`), `cancel_leave(id)`
+  - `set_closure(a, b, note)` (admin)
+  - `set_au(user, day, received)` (admin)
+  - `set_note(user, day, text|null)` (admin)
+- **Reads:** `team_day_load(a, b)` · `request_conflicts()` · `missing_au()` · `team_calendar(a, b)` (security definer; returns only `(name, day, status)`)
+- **RPC results:** RPCs that notify people return the rows to email (`[{ user_id, email, subject, text }]`). Server actions send those emails.
+- **Scheduled jobs:** monthly retention purge of `is_health` days older than 3 full years (plus their audit rows) · daily `pg_net` call to the reminders endpoint.
+
+## 6. Project structure
+```
+app/login · app/me · app/admin · app/admin/employees/[id] · app/admin/closures · app/admin/audit
+app/einladung/[token] (set password) · app/passwort-vergessen
+app/admin/export (xlsx route) · app/admin/backup (json route) · app/api/cron/reminders
+app/actions.ts                 → server actions: RPC → email → revalidate
+components/                    → AttendanceGrid, PersonView, YearCalendar, RequestList,
+                                 PendingRequests, MissingAu, NotificationBell
+lib/supabase/{server,browser,admin}.ts · lib/mail.ts · lib/invites.ts (create / hash / redeem) · lib/dates.ts · lib/labels.ts (German text)
+supabase/migrations/ · supabase/seed.sql · supabase/tests/ (pgTAP)
+tests/ (Vitest) · e2e/ (Playwright) · scripts/ (create-admin, import-praxisplan) · specs/
+```
+
+## 7. Code style
+- TypeScript strict, no `any`. Server Components by default; `"use client"` only for the grid, bell and forms.
+- **No business rules in TypeScript.** If a rule matters, it goes in SQL with a pgTAP test.
+- Names: `camelCase` in TypeScript, `snake_case` in SQL, components in `PascalCase.tsx`. User-facing text lives in `lib/labels.ts`.
+- Prettier defaults with 100-character lines. Comments only where the reason isn't obvious.
+
+```ts
+"use server";
+export async function requestLeave(input: RequestLeaveInput): Promise<ActionResult> {
+  const supabase = await createServerClient();
+  const { data, error } = await supabase.rpc("request_leave", input);
+  if (error) return { ok: false, message: error.message }; // German message from SQL
+  await sendAll(data.emails);                                // logs failures, never throws
+  revalidatePath("/me");
+  return { ok: true };
+}
+```
+
+## 8. Testing strategy
+| Level | Tool | Covers |
+|---|---|---|
+| Database | pgTAP (`supabase/tests/*.sql`) | Every rule: holidays, part-time counting, half days, balances and expiry, pro-rata, overlaps, staffing load, closures, AU runs, RLS, `team_calendar` masking, retention |
+| Unit | Vitest (`tests/`) | Grid click cycle, date helpers, mail templates, import parser |
+| End-to-end | Playwright (`e2e/`) | Login; invite → set password; used/expired link refused; request → ⚠ conflict → approve → bell; sick report; grid click; deactivate blocks login; export |
+| Data | `import-praxisplan --dry-run` | Old vs. new totals per employee |
+
+Tests are written red → green, alongside each task. A failing test is never deleted or weakened without approval.
+
+## 9. Commands
+```bash
+npm run dev | build | lint | format | typecheck
+npm test                 # vitest run
+npm run test:e2e         # playwright (local Supabase + dev server)
+npx supabase start       # local stack (Docker)
+npx supabase test db     # pgTAP
+npx supabase db reset    # re-apply migrations + seed locally
+npx supabase db push --db-url "$SUPABASE_DB_URL"   # production — ask first
+node scripts/create-admin.mjs <username> "<Name>" <password>
+node scripts/import-praxisplan.mjs <file> [--dry-run]
+```
+
+## 10. Boundaries
+- **Always:**
+  - Update `specs/` before implementing anything new.
+  - Run lint, typecheck, unit tests and pgTAP before each commit.
+  - Keep RLS on every table, validate input on the server, and keep health data admin-only.
+- **Ask first:**
+  - A production `db push`.
+  - A new dependency.
+  - Changing legal rules or retention.
+  - Real emails to staff.
+  - The production import.
+  - Deleting data.
+- **Never:**
+  - Commit `.env` or keys, or use the service-role key in the browser.
+  - Expose absence types to colleagues.
+  - Disable RLS.
+  - Edit an applied migration.
+  - Skip or delete a failing test.
+  - Build anything that isn't in the specs.
+
