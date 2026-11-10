@@ -8,7 +8,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T1 Core schema** (Req R1, R3, R19, R24, R25)
   - Work: `teams`, `absence_types` (with the fixed-type trigger and the 15 seeded types), `app_settings`, `profiles` + trigger, `is_admin`, base RLS, seed.
   - Verify: `npx supabase test db` (RLS: employee reads only their own profile)
-- [ ] **T2 Calendar** (Req R5, R6)
+- [x] **T2 Calendar** (Req R5, R6)
   - Work: `berlin_holidays`, `person_workdays`.
   - Verify: pgTAP: 2026 dates; a Mon/Tue/Thu part-timer's 6.–10.4.2026 counts 2 days
 
