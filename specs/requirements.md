@@ -1,5 +1,5 @@
 # Requirements — MVZ El-Sharafi: Anwesenheit & Urlaub
-**Status:** Draft v1.1 · **Date:** 2026-11-10
+**Status:** Draft v1.2 · **Date:** 2026-11-10
 
 ## 1. Objective
 Replace the single-PC file `PraxisPlan V2.1.html` with an online app.
@@ -30,15 +30,37 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 - Each row SHALL show sick / vacation-taken / remaining counts. WHEN a count is clicked, the system SHALL list those dates.
 - A yellow line SHALL mark the month start and a blue line SHALL follow each Friday. Holidays SHALL be a red column that can't be clicked, and today SHALL be highlighted.
 - WHEN a cell is clicked, it SHALL cycle empty → X → U → empty and save immediately.
-- WHEN a cell is right-clicked, a menu SHALL offer every absence type, half day (morning or afternoon), "AU liegt vor", and a note.
+- WHEN a cell is right-clicked, a menu SHALL offer every visible absence type, half day (morning or afternoon), "AU liegt vor", and a note. Options switched off in Settings (R24) SHALL NOT appear.
 - Markers: an orange dot for a note, a red corner for a missing AU, a faded "?" for pending entries, and hatching on a person's non-working days.
 
 ### R3 Absence types
-- Types: U Urlaub, B Betriebsurlaub, X Krank, K Kind krank, F Fortbildung, S Sonderurlaub, Ü Überstundenabbau.
-- U and B deduct vacation. X and K are health data. X and K are entered directly; U, F, S and Ü need approval when the employee requests them.
+- THE SYSTEM SHALL start with these types (managed afterwards under R25):
+
+| Code | Letter | Label | Entered by | Deducts vacation | Health data | Limit (warning) | Fixed |
+|---|---|---|---|---|---|---|---|
+| vacation | U | Urlaub | request | yes | | | yes |
+| closure | B | Betriebsurlaub | admin | yes | | | yes |
+| sick | X | Krank | report | | yes | | yes |
+| child_sick | K | Kind krank | report | | yes | | |
+| training | F | Fortbildung | request | | | | |
+| education | BU | Bildungsurlaub (Berliner Bildungszeitgesetz) | request | | | 10 days / 2 years | |
+| special_wedding | SH | Sonderurlaub Hochzeit | request | | | 1 day / year | |
+| special_birth | SG | Sonderurlaub Geburt eines Kindes | request | | | 1 day / year | |
+| special_death | ST | Sonderurlaub Todesfall | request | | | 2 days / year | |
+| special_move | SU | Sonderurlaub Umzug | request | | | 1 day / year | |
+| special_other | S | Sonderurlaub sonstige | request | | | | |
+| overtime | Ü | Überstundenabbau | request | | | | |
+| unpaid | UU | Unbezahlter Urlaub | request | | | | |
+| parental | EZ | Elternzeit | admin | | | | |
+| maternity | MS | Mutterschutz | admin | | yes | | |
+
+"Entered by": **request** = the employee requests it and an admin approves; **report** = the employee enters it directly; **admin** = only an admin can enter it.
+
+- Only types marked "deducts vacation" SHALL reduce the vacation balance. Health-data types SHALL follow R11 and R20.
 
 ### R4 Half days
-- A half day (morning or afternoon) SHALL count as 0.5 and show as "½U".
+- A half day (morning or afternoon) SHALL count as 0.5 and show as "½" plus the letter (e.g. "½U").
+- IF the "Half days" switch is off (R24), THE SYSTEM SHALL hide the option and reject new half-day entries.
 
 ### R5 Part-time patterns
 - Each employee has working weekdays. THE SYSTEM SHALL count and allow absences only on those days.
@@ -47,7 +69,8 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 - THE SYSTEM SHALL compute Berlin public holidays for any year. Holidays SHALL NOT be enterable and SHALL NOT count.
 
 ### R7 Requests
-- An employee SHALL be able to request U/F/S/Ü for a date range, with half-day start/end and an optional substitute from the same category.
+- An employee SHALL be able to request any visible type marked "request" for a date range, with half-day start/end and an optional substitute from the same category.
+- IF the "Substitute" switch is off (R24), the substitute field SHALL be hidden and not saved.
 - IF a vacation request exceeds the available balance, THE SYSTEM SHALL reject it.
 - IF any day already has an entry, THE SYSTEM SHALL reject the request and name the day.
 - Accepted requests SHALL appear as pending.
@@ -68,6 +91,7 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 ### R11 Team calendar
 - An employee SHALL see their own category's absences, with colleagues shown only as **"abwesend"**.
 - The absence type SHALL never be sent to an employee for anyone but themselves.
+- IF the "Team calendar" switch is off (R24), THE SYSTEM SHALL return no colleague data to employees and hide the Team tab.
 
 ### R12 Balances
 - Per person and year, THE SYSTEM SHALL show: allowance, carry-over (used/expired), taken, pending, available, sick days, and the count for each other type.
@@ -91,6 +115,7 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 ### R17 AU tracking
 - "AU liegt vor" SHALL apply to a whole run of consecutive sick days.
 - Runs longer than 3 calendar days without an AU SHALL be listed for the admin and marked in the grid.
+- IF the "AU tracking" switch is off (R24), THE SYSTEM SHALL hide the AU option, list and marks. Stored AU flags SHALL be kept.
 
 ### R18 Notifications
 - A live in-app bell plus SMTP email, for:
@@ -125,8 +150,26 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 - IF the link is used, expired, or belongs to a deactivated account, THE SYSTEM SHALL refuse it with a German message.
 - WHEN someone clicks "Passwort vergessen" and enters a username, THE SYSTEM SHALL always answer the same way, so nobody can find out which usernames exist. If that account has an email, the system SHALL email a new link, at most 1 per 15 minutes. Without an email, the page says "bitte an die Praxisleitung wenden".
 
+### R24 Settings (show/hide features)
+- An admin SHALL be able to switch these features on or off for the whole practice: **Team calendar** (R11), **Half days** (R4), **Substitute** (R7), **AU tracking** (R17). All four are on by default.
+- Each switch SHALL be enforced by the database as well as hidden in the UI.
+- Switching a feature off SHALL NOT delete any data. Switching it back on SHALL restore it as it was.
+- Every change to a switch SHALL be audit-logged (R20).
+
+### R25 Absence type management
+- An admin SHALL be able to add a type and edit its label, letter (1–2 characters, unique), colour, "entered by" (request / report / admin), "deducts vacation", "health data", an optional limit (days per 1 or 2 calendar years), and its sort order.
+- An admin SHALL be able to hide or show each type. Hidden types SHALL disappear from forms and menus, while existing entries stay visible and keep counting.
+- A type that has entries SHALL NOT be deletable, only hidden.
+- The fixed types Urlaub, Betriebsurlaub and Krank SHALL NOT be hidden or have their rules changed, because the grid click cycle, balances and closures depend on them. Their label and colour can still be changed.
+- WHEN a request or entry would go over a type's limit, THE SYSTEM SHALL warn the admin and show "x of y days used". It SHALL NOT block the entry.
+- A type's code SHALL never change once created. Changing the "health data" flag SHALL apply to all existing entries of that type.
+
+### R26 Admin range entry
+- An admin SHALL be able to enter any visible type for a date range for one employee (e.g. Elternzeit for 12 months). THE SYSTEM SHALL write approved days on that person's working days only, skip days that are already taken, and list them.
+- An admin SHALL be able to remove all of that person's entries of one type within a date range in one step.
+
 ## 3. Success criteria
-- All of R1–R23 are met and covered by the tests in `design.md` §8.
+- All of R1–R26 are met and covered by the tests in `design.md` §8.
 - The import dry-run matches 100%, or every difference is explained.
 - The build, lint, typecheck, unit, pgTAP and e2e checks all pass.
 - On a phone, the employee pages work at 375 px width. On a desktop, the admin grid handles 45 rows × a full month.
@@ -142,6 +185,8 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 - **iCal, PWA, sick-rate statistics:** not selected.
 - **Live grid sync, WhatsApp/SMS, a SmartQ link:** low value, a paid API, and a separate concern.
 - **Two-factor login:** not wanted; revisit if admin accounts are ever compromised.
+- **Automatic vacation reduction for Elternzeit (§17 BEEG):** the employer may cut 1/12 of the allowance per full month of Elternzeit, but this is optional and needs written notice. The admin adjusts the allowance by hand.
+- **Per-employee or per-team switches:** all switches apply to the whole practice.
 
 ## 5. Open questions
 1. **Old data file:** the PraxisPlan "Herunterladen" and/or Excel file, placed in the repo. Blocks R22 / T19.
@@ -154,4 +199,5 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 ## 6. Changelog
 - **v1 (2026-11-10):** first version, from the planning sessions and the screenshots of the current app.
 - **v1.1 (2026-11-10):** R1 changed and R23 added: first login via invite link (email or QR), self-service reset, no admin-set passwords.
+- **v1.2 (2026-11-10):** R3, R4, R7, R11 and R17 changed; R24 Settings, R25 Absence type management and R26 Admin range entry added.
 

@@ -32,7 +32,8 @@ pg_cron ─► retention purge (SQL)  ·  pg_net ─► POST {APP_URL}/api/cron/
 | Table | Key columns | Notes |
 |---|---|---|
 | `teams` | `id` (arbeiter / aerzte / verwaltung), `name`, `sort`, `max_absent` | Seeded |
-| `absence_types` | `code`, `letter`, `label`, `color`, `deducts_vacation`, `needs_approval`, `is_health` | Seeded with the 7 types |
+| `absence_types` | `code` (immutable), `letter` (1–2 characters, unique), `label`, `color`, `entry_mode` (request / report / admin), `deducts_vacation`, `is_health`, `limit_days?`, `limit_years?` (1 / 2), `visible`, `is_fixed`, `sort` | Seeded with the 15 types in requirements R3. `absence_days.type` and `leave_requests.type` reference `code` with **on delete restrict**, so the database blocks deleting a type that is in use. A trigger blocks changes to `entry_mode`, `deducts_vacation`, `is_health`, `visible` and `code` when `is_fixed`. |
+| `app_settings` | single row (`id boolean primary key default true check (id)`): `team_calendar`, `half_days`, `substitutes`, `au_tracking` (all `boolean default true`) | Readable by every signed-in user. Only admins can update it, and changes are audit-logged. |
 | `profiles` | `id` → `auth.users`, `username` (unique), `full_name`, `notify_email?`, `role`, `team_id`, `active`, `workdays smallint[]`, `start_date`, `end_date?`, `sort` | Created by a trigger on `auth.users`. `role` comes from `app_metadata`. |
 | `leave_allowances` | PK `(user_id, year)`, `days numeric(4,1)`, `carryover numeric(4,1)` | |
 | `leave_requests` | `id`, `user_id` (restrict), `type`, `start_date`, `end_date`, `start_half`, `end_half`, `substitute_id?`, `note`, `status`, `decided_by/at`, `decision_note` | |
@@ -56,6 +57,16 @@ All functions use `set search_path = public`, revoke `anon`, and run an explicit
   - `set_closure(a, b, note)` (admin)
   - `set_au(user, day, received)` (admin)
   - `set_note(user, day, text|null)` (admin)
+  - `set_absence_range(user, a, b, type)` and `clear_absence_range(user, a, b, type)` (admin; R26). They return the days that were skipped.
+  - `save_absence_type(...)` and `delete_absence_type(code)` (admin; R25)
+- **Feature switches (R24)**, enforced inside the functions:
+  - `half_days` off → `request_leave`, `set_absence` and `set_absence_range` reject half-day input.
+  - `substitutes` off → `request_leave` ignores `substitute_id`, and no substitute is notified.
+  - `team_calendar` off → `team_calendar()` returns nothing for non-admins.
+  - `au_tracking` off → `missing_au()` returns nothing, and `set_au` is rejected.
+  - Hidden types (`visible = false`) are rejected by `request_leave`, `report_absence`, `set_absence` and `set_absence_range`.
+  - `entry_mode` decides the path: `request` → `request_leave` (pending); `report` → `report_absence` (approved); `admin` → admin functions only.
+- **Limits (R25):** `type_usage(user, type, as_of)` returns used / limit over the type's window. `request_conflicts()` adds a limit warning.
 - **Reads:** `team_day_load(a, b)` · `request_conflicts()` · `missing_au()` · `team_calendar(a, b)` (security definer; returns only `(name, day, status)`)
 - **RPC results:** RPCs that notify people return the rows to email (`[{ user_id, email, subject, text }]`). Server actions send those emails.
 - **Scheduled jobs:** monthly retention purge of `is_health` days older than 3 full years (plus their audit rows) · daily `pg_net` call to the reminders endpoint.
@@ -63,12 +74,13 @@ All functions use `set search_path = public`, revoke `anon`, and run an explicit
 ## 6. Project structure
 ```
 app/login · app/me · app/admin · app/admin/employees/[id] · app/admin/closures · app/admin/audit
+app/admin/settings (feature switches + absence types)
 app/einladung/[token] (set password) · app/passwort-vergessen
 app/admin/export (xlsx route) · app/admin/backup (json route) · app/api/cron/reminders
 app/actions.ts                 → server actions: RPC → email → revalidate
 components/                    → AttendanceGrid, PersonView, YearCalendar, RequestList,
                                  PendingRequests, MissingAu, NotificationBell
-lib/supabase/{server,browser,admin}.ts · lib/mail.ts · lib/invites.ts (create / hash / redeem) · lib/dates.ts · lib/labels.ts (German text)
+lib/supabase/{server,browser,admin}.ts · lib/mail.ts · lib/settings.ts (reads app_settings + visible types for the UI) · lib/invites.ts (create / hash / redeem) · lib/dates.ts · lib/labels.ts (German text)
 supabase/migrations/ · supabase/seed.sql · supabase/tests/ (pgTAP)
 tests/ (Vitest) · e2e/ (Playwright) · scripts/ (create-admin, import-praxisplan) · specs/
 ```

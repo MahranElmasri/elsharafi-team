@@ -1,9 +1,9 @@
 # PRD — MVZ El-Sharafi: Anwesenheit & Urlaub
-**Version:** 1.1 · **Date:** 2026-11-10 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
+**Version:** 1.2 · **Date:** 2026-11-10 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
 
 | Document | Contents |
 |---|---|
-| [requirements.md](requirements.md) | Detailed requirements R1–R23 with acceptance criteria |
+| [requirements.md](requirements.md) | Detailed requirements R1–R26 with acceptance criteria |
 | [design.md](design.md) | Architecture, data model, code style, testing, commands, boundaries |
 | [tasks.md](tasks.md) | Task breakdown T0–T20 and progress |
 
@@ -33,7 +33,7 @@ One online app where:
 |---|---|---|
 | Access | Username login, invite link (email or QR) to set your own password, Passwort vergessen, activate/deactivate | R1, R19, R23 |
 | Admin grid | The familiar month grid: click cycle X → U → empty, right-click menu, notes, counts with drill-down, holiday/today/month/week markers | R2 |
-| Absence types | Urlaub, Betriebsurlaub, Krank, Kind krank, Fortbildung, Sonderurlaub, Überstundenabbau; half days | R3, R4 |
+| Absence types | Admin-managed list (add, rename, letter/colour, show/hide). Starts with Urlaub, Betriebsurlaub, Krank, Kind krank, Fortbildung, Bildungsurlaub, Sonderurlaub (Hochzeit, Geburt, Todesfall, Umzug, sonstige), Überstundenabbau, Unbezahlter Urlaub, Elternzeit, Mutterschutz. Optional limits per type; half days; admin range entry for long periods. | R3, R4, R25, R26 |
 | Correct counting | Part-time weekdays, Berlin holidays, closure days | R5, R6, R16 |
 | Requests | Request with substitute → pending → approve/deny/cancel; direct sick report | R7–R9 |
 | Team awareness | Same-category conflicts, staffing limit per category, team calendar showing only "abwesend" | R10, R11 |
@@ -41,6 +41,7 @@ One online app where:
 | Notifications | Live bell + SMTP email | R18 |
 | Privacy | Audit log, 3-year deletion of health data, sick details visible to admins only | R20 |
 | Data | Excel export, JSON backup, one-time import of 2026 from PraxisPlan | R21, R22 |
+| Settings | Admin page "Einstellungen" with on/off switches for team calendar, half days, substitute, AU tracking | R24 |
 
 ## 4a. First login & forgotten password
 1. The admin creates the employee (name, username, optional email, team, …).
@@ -52,6 +53,18 @@ One online app where:
 5. **Forgotten password:**
    - **With an email:** a self-service "Passwort vergessen" link.
    - **Without an email:** the admin makes a new link (same "Einladung erstellen" button).
+
+## 4b. Settings (show/hide features)
+The admin can switch these on or off for the whole practice on the **Einstellungen** page:
+
+| Switch | When off |
+|---|---|
+| Team calendar | Employees no longer see colleagues' absences. Admins still see everything. |
+| Half days | No ½-day option in requests or the grid. Existing half days stay as they are. |
+| Substitute (Vertretung) | The substitute field is hidden and not saved |
+| AU tracking | No "AU liegt vor" option, no warnings or red marks. The stored AU flags stay. |
+
+Absence types are shown or hidden one by one on the same page. A hidden type disappears from forms and menus, but past entries stay visible and keep counting.
 
 ## 5. Success metrics
 - **Day 1:** the old HTML file is retired, and imported 2026 totals match it for every employee.
@@ -81,4 +94,5 @@ Print view, blackout periods, a second language, approval for sick days, rotatin
 |---|---|---|
 | 1.0 | 2026-11-10 | First PRD, from the planning sessions, the screenshots of the current app, and the competitor comparison |
 | 1.1 | 2026-11-10 | First login via invite link (email/QR), self-service reset, no admin-set passwords |
+| 1.2 | 2026-11-10 | Settings page with feature switches; admin-managed absence types; new types Bildungsurlaub, Sonderurlaub subtypes, Unbezahlter Urlaub, Elternzeit, Mutterschutz; admin range entry |
 

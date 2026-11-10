@@ -5,8 +5,8 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [ ] **T0 Scaffold**
   - Work: `create-next-app` (TS, Tailwind, App Router, ESLint); add Prettier, Vitest, Playwright; `supabase init`; npm scripts.
   - Verify: `npm run build && npm run lint && npm test`
-- [ ] **T1 Core schema** (Req R1, R3, R19)
-  - Work: `teams`, `absence_types`, `profiles` + trigger, `is_admin`, base RLS, seed.
+- [ ] **T1 Core schema** (Req R1, R3, R19, R24, R25)
+  - Work: `teams`, `absence_types` (with the fixed-type trigger and the 15 seeded types), `app_settings`, `profiles` + trigger, `is_admin`, base RLS, seed.
   - Verify: `npx supabase test db` (RLS: employee reads only their own profile)
 - [ ] **T2 Calendar** (Req R5, R6)
   - Work: `berlin_holidays`, `person_workdays`.
@@ -28,6 +28,9 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [ ] **T7 Closures & AU** (Req R16, R17)
   - Work: `closure_days`, `set_closure`, `set_au`, `missing_au`.
   - Verify: pgTAP: closure is safe to repeat, conflicts are listed; a 4-day run without AU is listed
+- [ ] **T7b Settings, types & range entry in SQL** (Req R24, R25, R26)
+  - Work: switch checks inside the functions from T3–T7, `save_absence_type`, `delete_absence_type`, `type_usage`, `set_absence_range`, `clear_absence_range`.
+  - Verify: pgTAP: each switch off → its function rejects or returns nothing, and on again → the old data is back. A hidden type is rejected but old entries still count. A fixed type can't be hidden. A type in use can't be deleted. Bildungsurlaub over 10 days in 2 years produces a warning. A range entry skips non-working and already-taken days.
 - [ ] **T8 Retention & cron** (Req R15, R20)
   - Work: `reminder_log`, purge function, `pg_cron` jobs, `pg_net` call.
   - Verify: pgTAP: the purge removes 2022 sick days and keeps vacation
@@ -63,6 +66,9 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [ ] **T17 Closures & audit pages** (Req R16, R20)
   - Work: `/admin/closures`, `/admin/audit`.
   - Verify: manual and e2e for a closure
+- [ ] **T17b Settings page** (Req R24, R25, R26)
+  - Work: `/admin/settings` (4 switches + absence-type table with add, edit and show/hide), `lib/settings.ts`, hide the switched-off parts in the grid, `/me` and the request forms, the range-entry form on `/admin/employees/[id]`.
+  - Verify: e2e: switching off half days removes the ½ option everywhere; switching off the team calendar removes the Team tab; hiding a type removes it from the menu while old cells still show it; Elternzeit entered for 3 months shows in the grid.
 - [ ] **T18 Export & backup** (Req R21)
   - Work: the xlsx and json routes.
   - Verify: e2e download; the file opens and matches the grid
