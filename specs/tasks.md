@@ -31,7 +31,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T7b Settings, types & range entry in SQL** (Req R24, R25, R26)
   - Work: switch checks inside the functions from T3–T7, `save_absence_type`, `delete_absence_type`, `type_usage`, `set_absence_range`, `clear_absence_range`.
   - Verify: pgTAP: each switch off → its function rejects or returns nothing, and on again → the old data is back. A hidden type is rejected but old entries still count. A fixed type can't be hidden. A type in use can't be deleted. Bildungsurlaub over 10 days in 2 years produces a warning. A range entry skips non-working and already-taken days.
-- [ ] **T8 Retention & cron** (Req R15, R20)
+- [x] **T8 Retention & cron** (Req R15, R20)
   - Work: `reminder_log`, purge function, `pg_cron` jobs, `pg_net` call.
   - Verify: pgTAP: the purge removes 2022 sick days and keeps vacation
 
@@ -61,7 +61,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
   - Work: `NotificationBell` (Realtime), `lib/mail.ts`, wire up the actions.
   - Verify: Vitest for templates; e2e: the bell updates live
 - [ ] **T16 Reminders endpoint** (Req R15)
-  - Work: `api/cron/reminders` with a `CRON_SECRET` check, plus logging.
+  - Work: `api/cron/reminders` with a `CRON_SECRET` check: calls `run_reminders`, sends the emails, then `log_reminder_email` for each one sent.
   - Verify: `curl` with the secret writes `reminder_log`; a wrong secret gets 401
 - [ ] **T17 Closures & audit pages** (Req R16, R20)
   - Work: `/admin/closures`, `/admin/audit`.
@@ -79,5 +79,5 @@ Each task gets tests first and is ticked off when done. Each one touches at most
   - Work: the parser and script.
   - Verify: Vitest for the parser; `--dry-run` totals match
 - [ ] **T20 Release** (ask first)
-  - Work: `db push` to production, deploy, create the admin, real import, full e2e against staging.
+  - Work: `db push` to production, deploy, set the Vault secrets `app_url` and `cron_secret`, create the admin, real import, full e2e against staging.
   - Verify: every success criterion in `requirements.md` §3

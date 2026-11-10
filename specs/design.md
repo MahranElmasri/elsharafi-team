@@ -70,7 +70,8 @@ All functions use `set search_path = public`, revoke `anon`, and run an explicit
 - **Limits (R25):** `type_usage(user, type, as_of)` returns used / limit over the type's window. `request_limit_warnings()` (admin) lists pending requests that would exceed their type's limit; approved and pending days both count. Warning only.
 - **Reads:** `team_day_load(a, b)` · `request_conflicts()` (colleague, type, status, days) · `request_over_limit()` (days over `max_absent`) · `missing_au()` · `team_members()` (colleagues' names and workdays, for hatching) · `team_calendar(a, b)` (security definer; returns only `(user_id, full_name, day, status)`). The last two return nothing when the team-calendar switch is off.
 - **RPC results:** RPCs that notify people return the rows to email (`[{ user_id, email, subject, text }]`). Server actions send those emails.
-- **Scheduled jobs:** monthly retention purge of `is_health` days older than 3 full years (plus their audit rows) · daily `pg_net` call to the reminders endpoint.
+- **Reminders (R15, service role only):** `due_reminders(as_of)` decides who is due: `year_end` from 1.10. (available > 0), `carryover` 1.2.–31.3. (unused carry-over), at most once per kind and month. `run_reminders(as_of)` writes the in-app notification, logs `in_app` in `reminder_log` and returns the emails. The endpoint calls `log_reminder_email(...)` after each email is sent. `balance_of` also accepts the service role for this.
+- **Scheduled jobs:** `purge_health_data(today)` runs monthly (1st, 03:00 UTC). It deletes `is_health` days before 1.1. three years back, plus their notes and audit rows, and leaves one summary audit row. `call_reminders_endpoint()` runs daily (06:00 UTC). It posts to `{app_url}/api/cron/reminders` with `Bearer {cron_secret}`; both values are read from Supabase Vault (`app_url`, `cron_secret`, set at release in T20) and the call does nothing until they exist.
 
 ## 6. Project structure
 ```
