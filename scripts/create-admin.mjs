@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Creates the first admin account with a password (bootstrap only; later accounts use invites).
 // Usage: node --env-file=.env.local scripts/create-admin.mjs <username> "<Full Name>" <password> [email]
+// node --env-file=.env.local scripts/create-admin.mjs admin "Mahran Elmasri" 'M@hran_23672' mahran_masri@yahoo.com
 import { createClient } from "@supabase/supabase-js";
 
 const [username, fullName, password, email] = process.argv.slice(2);

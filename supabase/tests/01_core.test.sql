@@ -2,6 +2,10 @@
 begin;
 select plan(20);
 
+-- Start from an empty practice; everything is rolled back at the end, so local data is untouched.
+delete from absence_days; delete from leave_requests; delete from closure_days; delete from audit_log;
+delete from auth.users;
+
 -- Reference data
 select is((select count(*)::int from teams), 3, 'three teams are seeded');
 select is((select count(*)::int from absence_types), 15, 'fifteen absence types are seeded');

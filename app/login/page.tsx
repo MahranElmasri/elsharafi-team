@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { labels } from "@/lib/labels";
 import { createServerClient } from "@/lib/supabase/server";
@@ -28,6 +29,9 @@ export default async function LoginPage({
       <section className="grid gap-6 border-t-2 border-ink pt-6">
         <h2 className="text-xl font-bold">{labels.login.title}</h2>
         <LoginForm notice={gesperrt ? labels.login.blocked : undefined} />
+        <Link href="/passwort-vergessen" className="btn-plain justify-self-start">
+          {labels.forgotLink}
+        </Link>
       </section>
     </main>
   );

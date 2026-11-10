@@ -2,6 +2,10 @@
 begin;
 select plan(17);
 
+-- Start from an empty practice; everything is rolled back at the end, so local data is untouched.
+delete from absence_days; delete from leave_requests; delete from closure_days; delete from audit_log;
+delete from auth.users;
+
 insert into auth.users (id, email, raw_user_meta_data, raw_app_meta_data) values
   ('00000000-0000-0000-0000-000000000201', 'leitung@example.org',
    '{"username":"leitung","full_name":"Praxis Leitung","team":"verwaltung","start_date":"2020-01-01"}', '{"role":"admin"}'),

@@ -29,6 +29,8 @@ pg_cron ─► retention purge (SQL)  ·  pg_net ─► POST {APP_URL}/api/cron/
   - Creating a token marks all of that person's older unused tokens as used.
   - Redeem: look up `token_hash`, then run an atomic `update … set used_at = now() where used_at is null and expires_at > now() returning user_id`. Check that the profile is active, set the password with `auth.admin.updateUserById`, sign in, and redirect to `/me` or `/admin`.
   - "Passwort vergessen" uses the same mechanism (`purpose = reset`): the link is sent by nodemailer, at most 1 per 15 minutes per person, and the page always gives the same answer.
+  - SQL functions (service role only): `create_invite(user, purpose, hash, by)` · `request_reset(username, hash)` (returns the email target, or nothing when the account is unknown, inactive, has no email, or asked within 15 minutes) · `peek_invite(hash)` (`ok` / `unknown` / `used` / `expired` / `inactive`, for the page) · `redeem_invite(hash)` (the atomic update above).
+  - `lib/mail.ts` never throws. Without `SMTP_HOST` it writes the mail to the server log in development and logs an error in production.
 
 ## 4. Data model (`supabase/migrations`)
 | Table | Key columns | Notes |
@@ -114,7 +116,7 @@ export async function requestLeave(input: RequestLeaveInput): Promise<ActionResu
 | End-to-end | Playwright (`e2e/`) | Login; invite → set password; used/expired link refused; request → ⚠ conflict → approve → bell; sick report; grid click; deactivate blocks login; export |
 | Data | `import-praxisplan --dry-run` | Old vs. new totals per employee |
 
-Tests are written red → green, alongside each task. A failing test is never deleted or weakened without approval.
+Each pgTAP file first empties the tables inside its own transaction (rolled back at the end), so local data never affects the result. Tests are written red → green, alongside each task. A failing test is never deleted or weakened without approval.
 
 ## 9. Commands
 ```bash

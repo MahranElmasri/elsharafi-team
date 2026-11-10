@@ -2,6 +2,10 @@
 begin;
 select plan(9);
 
+-- Start from an empty practice; everything is rolled back at the end, so local data is untouched.
+delete from absence_days; delete from leave_requests; delete from closure_days; delete from audit_log;
+delete from auth.users;
+
 select results_eq(
   $$select day from berlin_holidays(2026)$$,
   $$values ('2026-01-01'::date), ('2026-03-08'), ('2026-04-03'), ('2026-04-06'), ('2026-05-01'),
