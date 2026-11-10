@@ -54,6 +54,7 @@
   --color-krank: var(--krank);
   --color-urlaub: var(--urlaub);
   --color-marker: var(--marker);
+  --color-on-ink: var(--on-ink);
   --font-sans: var(--font-atkinson), system-ui, sans-serif;
 }
 
@@ -98,5 +99,12 @@ body {
   }
   .btn-plain:hover {
     color: var(--ink);
+  }
+}
+
+/* Printing an invite: only the QR sheet. */
+@media print {
+  body:has(.invite-sheet) main > :not(:has(.invite-sheet)) {
+    display: none;
   }
 }

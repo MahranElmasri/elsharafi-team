@@ -62,6 +62,7 @@ All functions use `set search_path = public`, revoke `anon`, and run an explicit
   - `set_au(user, day, received)` (admin)
   - `set_note(user, day, text|null)` (admin)
   - `set_absence_range(user, a, b, type)` and `clear_absence_range(user, a, b, type)` (admin; R26). They return the days that were skipped.
+  - Employees (admin; R19, R13): `employee_conflict(user, username, email)` (German message or null) · `save_employee(...)` · `set_employee_active(user, active)` (also voids open invite links) · `delete_employee(user)` (only without entries; deletes the Auth user, which cascades) · `set_allowance(user, year, days, carryover)` · `set_team_limit(team, max)`. Nobody can deactivate, delete or demote themselves. The server action creates the Auth account and afterwards updates its login email, `app_metadata.role` and ban (`876000h` when deactivated, `none` when reactivated).
   - `save_absence_type(...)` and `delete_absence_type(code)` (admin; R25)
 - **Feature switches (R24)**, enforced inside the functions:
   - `half_days` off → `request_leave`, `set_absence` and `set_absence_range` reject half-day input.
@@ -78,7 +79,7 @@ All functions use `set search_path = public`, revoke `anon`, and run an explicit
 
 ## 6. Project structure
 ```
-app/login · app/me · app/admin · app/admin/employees/[id] · app/admin/closures · app/admin/audit
+app/login · app/me · app/admin · app/admin/employees (list, add, team limits) · app/admin/employees/[id] (T10: details, allowance, invite, account; T14 adds the person view) · app/admin/closures · app/admin/audit
 app/admin/settings (feature switches + absence types)
 app/einladung/[token] (set password) · app/passwort-vergessen
 app/admin/export (xlsx route) · app/admin/backup (json route) · app/api/cron/reminders
@@ -87,7 +88,8 @@ components/                    → AttendanceGrid, PersonView, YearCalendar, Req
                                  PendingRequests, MissingAu, NotificationBell
 lib/supabase/{server,browser,admin}.ts · lib/mail.ts · lib/settings.ts (reads app_settings + visible types for the UI) · lib/invites.ts (create / hash / redeem) · lib/dates.ts · lib/labels.ts (German text)
 supabase/migrations/ (schema + reference data: teams, absence types, settings row) · supabase/seed.sql (local test users only) · supabase/tests/ (pgTAP)
-tests/ (Vitest) · e2e/ (Playwright) · scripts/ (create-admin, import-praxisplan) · specs/
+lib/employees.ts (form parsing) · lib/people.ts (last sign-in per account)
+tests/ (Vitest) · e2e/ (Playwright; 2 workers and a 15 s expect timeout against the dev server) · scripts/ (create-admin, import-praxisplan) · specs/
 ```
 
 ## 7. Code style

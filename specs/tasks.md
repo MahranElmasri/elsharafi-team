@@ -42,7 +42,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T9b Invites & reset** (Req R23)
   - Work: `invite_tokens` migration, `lib/invites.ts`, `/einladung/[token]`, `/passwort-vergessen`.
   - Verify: Vitest for hash and expiry. e2e: create invite → open → set password → logged in. Opening a used link again is refused, and so is an expired link (adjust the clock with SQL). "Passwort vergessen" with an unknown username shows the same message.
-- [ ] **T10 Employee management** (Req R19, R13)
+- [x] **T10 Employee management** (Req R19, R13)
   - Work: `/admin/employees` + admin actions (create, ban, delete, "Einladung erstellen" with link + QR + email), the allowance suggestion, team limits.
   - Verify: e2e: add an employee; deleting someone with entries is refused
 - [ ] **T11 Grid view** (Req R2)

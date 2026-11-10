@@ -6,6 +6,10 @@ if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 
 export default defineConfig({
   testDir: "e2e",
+  // The dev server compiles each page on first use; 5 s is too tight under parallel load.
+  expect: { timeout: 15_000 },
+  // One dev server serves every browser; more than two at once makes logins time out.
+  workers: 2,
   use: {
     baseURL: "http://localhost:3000",
     locale: "de-DE",
