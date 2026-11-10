@@ -53,7 +53,7 @@ All functions use `set search_path = public`, revoke `anon`, and run an explicit
 - **Allowance:** `suggested_allowance(user, year, fulltime_days)` · `balance_of(user, year, as_of)` (yourself or admin) and `balances(year, as_of)` (security invoker; one row per visible profile). They return `remaining` = allowance + carry-over − expired − taken, and `available` = remaining − pending. Requests are checked against `available`.
 - **Writes:**
   - `set_absence(user, day, type|null, half|null)` (admin)
-  - `report_absence(type, a, b, note)` (employee)
+  - `report_absence(type, a, b, note)` (employee). Days that already have an entry are skipped and returned in `skipped`. Sick during vacation (§9 BUrlG: vacation days covered by an AU are credited back) is handled by the admin changing the cell from U to X.
   - `request_leave(...)`, `decide_leave(id, approve, note)` (uses `FOR UPDATE`), `cancel_leave(id)`
   - `set_closure(a, b, note)` (admin)
   - `set_au(user, day, received)` (admin)

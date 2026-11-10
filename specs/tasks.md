@@ -19,7 +19,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T4 Balances** (Req R12, R13, R14)
   - Work: `leave_allowances`, `balances`, `suggested_allowance`.
   - Verify: pgTAP: a joiner on 1.7. with 3 workdays gets 9 days; carry-over 5, 3 days used in March, 2 expired on 1.4.
-- [ ] **T5 Requests** (Req R7, R8, R9, R18)
+- [x] **T5 Requests** (Req R7, R8, R9, R18)
   - Work: `leave_requests`, `request_leave`, `report_absence`, `decide_leave`, `cancel_leave`, `notifications` rows + email payload.
   - Verify: pgTAP: over-balance rejected, overlap rejected, approve re-checks the balance, employee can't decide
 - [ ] **T6 Conflicts & team view** (Req R10, R11)
