@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+/* Design tokens: specs/design.md §11 ("pencil and ink"). */
+:root {
+  --paper: #f6f8f7;
+  --sheet: #ffffff;
+  --ink: #1d2b34;
+  --ink-2: #4a5862;
+  --pencil: #8c959b;
+  --rule: #dce2e0;
+  --krank: #c42f2a;
+  --urlaub: #2446a6;
+  --marker: #ffe14d;
+  --green: #2f7a55;
+  --violet: #6a4c9c;
+  --brown: #8a5a2b;
+  --slate: #4f6470;
+  --holiday: #f8e4e2;
+  --hatch: #e9edec;
+  --today: rgba(255, 225, 77, 0.42);
+  --on-ink: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #162026;
+    --sheet: #1c2930;
+    --ink: #e7edef;
+    --ink-2: #b3c0c6;
+    --pencil: #8e9ba2;
+    --rule: #2e3c44;
+    --krank: #ff7d73;
+    --urlaub: #94acff;
+    --marker: #e8c93a;
+    --green: #72d0a1;
+    --violet: #bba3ec;
+    --brown: #dca878;
+    --slate: #a2b6c2;
+    --holiday: #3a2628;
+    --hatch: #24323a;
+    --today: rgba(232, 201, 58, 0.2);
+    --on-ink: #162026;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-sheet: var(--sheet);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-pencil: var(--pencil);
+  --color-rule: var(--rule);
+  --color-krank: var(--krank);
+  --color-urlaub: var(--urlaub);
+  --color-marker: var(--marker);
+  --font-sans: var(--font-atkinson), system-ui, sans-serif;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 3px solid var(--urlaub);
+  outline-offset: 2px;
+}

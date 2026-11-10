@@ -2,7 +2,7 @@
 Each task gets tests first and is ticked off when done. Each one touches at most ~5 files. `Req` points to the requirements it covers.
 
 ## Phase A — Foundation
-- [ ] **T0 Scaffold**
+- [x] **T0 Scaffold**
   - Work: `create-next-app` (TS, Tailwind, App Router, ESLint); add Prettier, Vitest, Playwright; `supabase init`; npm scripts.
   - Verify: `npm run build && npm run lint && npm test`
 - [ ] **T1 Core schema** (Req R1, R3, R19, R24, R25)
