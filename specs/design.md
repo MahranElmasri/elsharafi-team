@@ -55,7 +55,7 @@ All functions use `set search_path = public`, revoke `anon`, and run an explicit
   - `set_absence(user, day, type|null, half|null)` (admin)
   - `report_absence(type, a, b, note)` (employee). Days that already have an entry are skipped and returned in `skipped`. Sick during vacation (§9 BUrlG: vacation days covered by an AU are credited back) is handled by the admin changing the cell from U to X.
   - `request_leave(...)`, `decide_leave(id, approve, note)` (uses `FOR UPDATE`), `cancel_leave(id)`
-  - `set_closure(a, b, note)` (admin)
+  - `set_closure(a, b, note)` and `remove_closure(a, b)` (admin; at most 31 days per closure)
   - `set_au(user, day, received)` (admin)
   - `set_note(user, day, text|null)` (admin)
   - `set_absence_range(user, a, b, type)` and `clear_absence_range(user, a, b, type)` (admin; R26). They return the days that were skipped.

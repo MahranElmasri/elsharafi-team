@@ -25,7 +25,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T6 Conflicts & team view** (Req R10, R11)
   - Work: `team_day_load`, `request_conflicts`, `team_calendar`.
   - Verify: pgTAP: same team flagged, other team not; the type is never returned
-- [ ] **T7 Closures & AU** (Req R16, R17)
+- [x] **T7 Closures & AU** (Req R16, R17)
   - Work: `closure_days`, `set_closure`, `set_au`, `missing_au`.
   - Verify: pgTAP: closure is safe to repeat, conflicts are listed; a 4-day run without AU is listed
 - [ ] **T7b Settings, types & range entry in SQL** (Req R24, R25, R26)
