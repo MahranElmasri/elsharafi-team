@@ -15,7 +15,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="de" className={atkinson.variable}>
-      <body>{children}</body>
+      {/* Browser extensions (e.g. ColorZilla) add attributes to <body> before hydration. */}
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }
