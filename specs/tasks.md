@@ -13,7 +13,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
   - Verify: pgTAP: 2026 dates; a Mon/Tue/Thu part-timer's 6.–10.4.2026 counts 2 days
 
 ## Phase B — Rules in the database
-- [ ] **T3 Absence days** (Req R2, R4, R20)
+- [x] **T3 Absence days** (Req R2, R4, R20)
   - Work: `absence_days` + workday trigger, `set_absence`, `day_notes` / `set_note`, `audit_log` triggers.
   - Verify: pgTAP: X on a Saturday fails, a second entry on the same day fails, the audit row is written
 - [ ] **T4 Balances** (Req R12, R13, R14)

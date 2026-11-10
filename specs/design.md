@@ -40,7 +40,7 @@ pg_cron ─► retention purge (SQL)  ·  pg_net ─► POST {APP_URL}/api/cron/
 | `leave_requests` | `id`, `user_id` (restrict), `type`, `start_date`, `end_date`, `start_half`, `end_half`, `substitute_id?`, `note`, `status`, `decided_by/at`, `decision_note` | |
 | `absence_days` | PK `(user_id, day)`, `type`, `amount` (1 / 0.5), `half?`, `status` (pending / approved), `request_id?`, `au_received`, `created_by` | A trigger rejects non-working days. FK `user_id` is restrict, so the database itself blocks deleting employees who have entries. |
 | `closure_days` | PK `day`, `note` | |
-| `day_notes` | PK `(user_id, day)`, `note` | |
+| `day_notes` | PK `(user_id, day)`, `note`, `updated_by`, `updated_at` | Admin-only (read and write): notes can hold internal remarks |
 | `notifications` | `id`, `user_id`, `message`, `link`, `read_at`, `created_at` | Realtime publication |
 | `audit_log` | `id`, `actor`, `table_name`, `row_key`, `action`, `old`, `new`, `at` | Written by triggers; admins can read it |
 | `invite_tokens` | `id`, `user_id` (cascade), `token_hash` (sha256, unique), `purpose` (invite / reset), `expires_at`, `used_at?`, `created_by?`, `created_at` | RLS on with no policies: service role only |
