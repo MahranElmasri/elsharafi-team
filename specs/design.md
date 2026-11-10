@@ -68,7 +68,7 @@ All functions use `set search_path = public`, revoke `anon`, and run an explicit
   - Hidden types (`visible = false`) are rejected by `request_leave`, `report_absence`, `set_absence` and `set_absence_range`.
   - `entry_mode` decides the path: `request` → `request_leave` (pending); `report` → `report_absence` (approved); `admin` → admin functions only.
 - **Limits (R25):** `type_usage(user, type, as_of)` returns used / limit over the type's window. `request_conflicts()` adds a limit warning.
-- **Reads:** `team_day_load(a, b)` · `request_conflicts()` · `missing_au()` · `team_calendar(a, b)` (security definer; returns only `(name, day, status)`)
+- **Reads:** `team_day_load(a, b)` · `request_conflicts()` (colleague, type, status, days) · `request_over_limit()` (days over `max_absent`) · `missing_au()` · `team_members()` (colleagues' names and workdays, for hatching) · `team_calendar(a, b)` (security definer; returns only `(user_id, full_name, day, status)`). The last two return nothing when the team-calendar switch is off.
 - **RPC results:** RPCs that notify people return the rows to email (`[{ user_id, email, subject, text }]`). Server actions send those emails.
 - **Scheduled jobs:** monthly retention purge of `is_health` days older than 3 full years (plus their audit rows) · daily `pg_net` call to the reminders endpoint.
 

@@ -22,7 +22,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T5 Requests** (Req R7, R8, R9, R18)
   - Work: `leave_requests`, `request_leave`, `report_absence`, `decide_leave`, `cancel_leave`, `notifications` rows + email payload.
   - Verify: pgTAP: over-balance rejected, overlap rejected, approve re-checks the balance, employee can't decide
-- [ ] **T6 Conflicts & team view** (Req R10, R11)
+- [x] **T6 Conflicts & team view** (Req R10, R11)
   - Work: `team_day_load`, `request_conflicts`, `team_calendar`.
   - Verify: pgTAP: same team flagged, other team not; the type is never returned
 - [ ] **T7 Closures & AU** (Req R16, R17)
