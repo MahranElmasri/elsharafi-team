@@ -16,7 +16,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T3 Absence days** (Req R2, R4, R20)
   - Work: `absence_days` + workday trigger, `set_absence`, `day_notes` / `set_note`, `audit_log` triggers.
   - Verify: pgTAP: X on a Saturday fails, a second entry on the same day fails, the audit row is written
-- [ ] **T4 Balances** (Req R12, R13, R14)
+- [x] **T4 Balances** (Req R12, R13, R14)
   - Work: `leave_allowances`, `balances`, `suggested_allowance`.
   - Verify: pgTAP: a joiner on 1.7. with 3 workdays gets 9 days; carry-over 5, 3 days used in March, 2 expired on 1.4.
 - [ ] **T5 Requests** (Req R7, R8, R9, R18)

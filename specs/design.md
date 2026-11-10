@@ -50,7 +50,7 @@ pg_cron ─► retention purge (SQL)  ·  pg_net ─► POST {APP_URL}/api/cron/
 All functions use `set search_path = public`, revoke `anon`, and run an explicit `is_admin()` or owner check. Errors are raised as German messages.
 
 - **Calendar:** `berlin_holidays(year)` (Gauss/Meeus) · `person_workdays(user, a, b)`
-- **Allowance:** `suggested_allowance(user, year, fulltime_days)` · `balances(year, as_of)` (security invoker; includes carry-over expiry)
+- **Allowance:** `suggested_allowance(user, year, fulltime_days)` · `balance_of(user, year, as_of)` (yourself or admin) and `balances(year, as_of)` (security invoker; one row per visible profile). They return `remaining` = allowance + carry-over − expired − taken, and `available` = remaining − pending. Requests are checked against `available`.
 - **Writes:**
   - `set_absence(user, day, type|null, half|null)` (admin)
   - `report_absence(type, a, b, note)` (employee)
