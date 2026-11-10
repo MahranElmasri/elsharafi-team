@@ -84,7 +84,7 @@ app/admin/settings (feature switches + absence types)
 app/einladung/[token] (set password) · app/passwort-vergessen
 app/admin/export (xlsx route) · app/admin/backup (json route) · app/api/cron/reminders
 app/actions.ts                 → server actions: RPC → email → revalidate
-components/                    → AttendanceGrid, PersonView, YearCalendar, RequestList,
+components/                    → AttendanceGrid, GridMenu, me/{MeActions, MonthCalendar, TeamCalendar, RequestList},
                                  PendingRequests, MissingAu, NotificationBell
 lib/supabase/{server,browser,admin}.ts · lib/mail.ts · lib/settings.ts (reads app_settings + visible types for the UI) · lib/invites.ts (create / hash / redeem) · lib/dates.ts · lib/labels.ts (German text)
 supabase/migrations/ (schema + reference data: teams, absence types, settings row) · supabase/seed.sql (local test users only) · supabase/tests/ (pgTAP)
@@ -190,6 +190,7 @@ Other types use muted inks (green `#2F7A55`, violet `#6A4C9C`, brown `#8A5A2B`, 
   - The weekday circles.
   - Two buttons: "Urlaub beantragen" and "Krank melden".
   - A month calendar and "Meine Anträge".
+  - T13: `/me?monat=YYYY-MM&ansicht=team`. The two forms open as dialogs; the database's message is shown in the dialog. "Alle Zahlen" lists every R12 figure. Tabs "Mein Kalender" / "Team" (Team hidden when the switch is off). Pending requests can be withdrawn from "Meine Anträge". `lib/me-data.ts` loads the page; `app/actions/me.ts` (requestLeave, reportSick, withdrawRequest) sends the emails the RPC returns via `sendAll` in `lib/mail.ts`.
 
 **Voice:**
 - Staff are addressed as **"Sie"**.

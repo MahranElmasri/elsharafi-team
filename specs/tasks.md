@@ -51,7 +51,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T12 Grid editing** (Req R2, R4, R17)
   - Work: click cycle (optimistic), right-click menu, notes, AU, count popover.
   - Verify: Vitest for the cycle; e2e for a grid click
-- [ ] **T13 Employee page** (Req R7, R8, R11, R12)
+- [x] **T13 Employee page** (Req R7, R8, R11, R12)
   - Work: `PersonView`, `YearCalendar`, `RequestList`, `/me` forms, Team tab.
   - Verify: e2e: request + sick report; works at 375 px
 - [ ] **T14 Approvals panel** (Req R9, R10, R17)

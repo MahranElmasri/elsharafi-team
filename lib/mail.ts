@@ -49,3 +49,13 @@ export async function sendMail(mail: Mail): Promise<boolean> {
     return false;
   }
 }
+
+/** Sends the emails an RPC returned ([{to, subject, text}]). Failures are logged, never thrown. */
+export async function sendAll(mails: unknown): Promise<void> {
+  if (!Array.isArray(mails)) return;
+  await Promise.all(
+    mails
+      .filter((m): m is Mail => typeof m?.to === "string" && typeof m?.subject === "string")
+      .map((m) => sendMail({ to: m.to, subject: m.subject, text: m.text })),
+  );
+}
