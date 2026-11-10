@@ -85,7 +85,7 @@ app/einladung/[token] (set password) · app/passwort-vergessen
 app/admin/export (xlsx route) · app/admin/backup (json route) · app/api/cron/reminders
 app/actions.ts                 → server actions: RPC → email → revalidate
 components/                    → AttendanceGrid, GridMenu, BalanceDetails, admin/ApprovalsDrawer, me/{MeActions, MonthCalendar, TeamCalendar, RequestList},
-                                 PendingRequests, MissingAu, NotificationBell
+                                 NotificationBell (T15)
 lib/supabase/{server,browser,admin}.ts · lib/mail.ts · lib/settings.ts (reads app_settings + visible types for the UI) · lib/invites.ts (create / hash / redeem) · lib/dates.ts · lib/labels.ts (German text)
 supabase/migrations/ (schema + reference data: teams, absence types, settings row) · supabase/seed.sql (local test users only) · supabase/tests/ (pgTAP)
 lib/employees.ts (form parsing) · lib/people.ts (last sign-in per account) · lib/grid.ts (month columns, display helpers) · lib/grid-data.ts (loads one month for the grid: entries, holidays, notes, missing AU, balances, team load) · app/actions/grid.ts (setCell, saveNote, setAu, listDays: thin wrappers over the SQL functions) · components/GridMenu.tsx (cell context menu)
