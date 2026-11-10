@@ -18,6 +18,7 @@
   --holiday: #f8e4e2;
   --hatch: #e9edec;
   --today: rgba(255, 225, 77, 0.42);
+  --note: #e8892b;
   --on-ink: #ffffff;
 }
 
@@ -39,6 +40,7 @@
     --holiday: #3a2628;
     --hatch: #24323a;
     --today: rgba(232, 201, 58, 0.2);
+    --note: #f0a050;
     --on-ink: #162026;
     color-scheme: dark;
   }
@@ -106,5 +108,169 @@ body {
 @media print {
   body:has(.invite-sheet) main > :not(:has(.invite-sheet)) {
     display: none;
+  }
+}
+
+/* ---------------------------------------------------------------- admin grid (design.md §11) */
+@layer components {
+  .roster-sheet {
+    background: var(--sheet);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    overflow: auto;
+    max-height: calc(100dvh - 15rem);
+  }
+  table.roster {
+    border-collapse: separate;
+    border-spacing: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .roster th,
+  .roster td {
+    border-bottom: 1px solid var(--rule);
+    border-right: 1px solid var(--rule);
+    padding: 0;
+  }
+  .roster thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--sheet);
+    font-weight: 500;
+    height: 62px;
+    vertical-align: bottom;
+    padding: 6px 0 8px;
+  }
+  .roster .who {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    background: var(--sheet);
+    text-align: left;
+    border-right: 2px solid var(--ink);
+    padding: 6px 12px;
+    min-width: 300px;
+  }
+  .roster thead .who {
+    z-index: 4;
+  }
+  .roster .day {
+    width: 46px;
+    min-width: 46px;
+    text-align: center;
+  }
+  .roster .fri {
+    border-right: 2px solid var(--ink-2);
+  }
+  .roster .month-start {
+    box-shadow: inset 3px 0 0 var(--marker);
+  }
+  .roster td.hol {
+    background: var(--holiday);
+  }
+  .roster thead th.hol {
+    background: linear-gradient(var(--holiday), var(--holiday)), var(--sheet);
+  }
+  .roster td.today {
+    background: var(--today);
+  }
+  .roster thead th.today {
+    background: linear-gradient(var(--today), var(--today)), var(--sheet);
+  }
+  .roster td.off {
+    background: repeating-linear-gradient(135deg, var(--hatch) 0 4px, transparent 4px 8px);
+  }
+  .roster td.today.off {
+    background:
+      repeating-linear-gradient(135deg, var(--hatch) 0 4px, transparent 4px 8px), var(--today);
+  }
+  .roster .cell {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+  }
+  .roster .note-dot {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--note);
+  }
+  .roster .au-miss {
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-top: 11px solid var(--krank);
+    border-right: 11px solid transparent;
+  }
+  .roster .over {
+    display: block;
+    width: max-content;
+    margin: 2px auto 0;
+    border-radius: 6px;
+    padding: 0 5px;
+    background: var(--krank);
+    color: var(--on-ink);
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  /* Stamps: ink = approved, pencil = pending. */
+  .stamp {
+    --c: var(--urlaub);
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2.5px solid var(--c);
+    color: var(--c);
+    background: color-mix(in srgb, var(--c) 10%, transparent);
+    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c) 14%, transparent);
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    transform: rotate(var(--r, 0deg));
+  }
+  .stamp.two {
+    font-size: 11.5px;
+  }
+  .stamp.pending {
+    border: 1.5px dashed var(--pencil);
+    color: var(--pencil);
+    background: none;
+    box-shadow: none;
+    font-weight: 700;
+    transform: none;
+  }
+  .stamp.am {
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--c) 30%, transparent) 50%,
+      transparent 50%
+    );
+  }
+  .stamp.pm {
+    background: linear-gradient(
+      90deg,
+      transparent 50%,
+      color-mix(in srgb, var(--c) 30%, transparent) 50%
+    );
+  }
+  .stamp .half-mark {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    border: 1px solid currentColor;
+    border-radius: 8px;
+    background: var(--sheet);
+    padding: 0 3px;
+    font-size: 10px;
+    line-height: 14px;
   }
 }

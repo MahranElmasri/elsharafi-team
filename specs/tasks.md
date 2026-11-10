@@ -45,7 +45,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T10 Employee management** (Req R19, R13)
   - Work: `/admin/employees` + admin actions (create, ban, delete, "Einladung erstellen" with link + QR + email), the allowance suggestion, team limits.
   - Verify: e2e: add an employee; deleting someone with entries is refused
-- [ ] **T11 Grid view** (Req R2)
+- [x] **T11 Grid view** (Req R2)
   - Work: `AttendanceGrid` (read only): month, search, tabs, counts, lines, holidays, today, hatching.
   - Verify: Vitest for the column builder; manual check with 45 rows
 - [ ] **T12 Grid editing** (Req R2, R4, R17)
