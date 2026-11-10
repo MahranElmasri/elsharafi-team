@@ -25,10 +25,13 @@ export interface MyBalance {
   carryoverExpired: number;
   taken: number;
   pending: number;
-  available: number;
+  remaining: number; // without pending requests
+  available: number; // after pending requests
   sick: number;
   byType: Record<string, number>;
 }
+
+export type TypeInfo = { letter: string; label: string; color: string; deductsVacation: boolean };
 
 export interface MeData {
   year: number;
@@ -38,7 +41,7 @@ export interface MeData {
   balance: MyBalance;
   hasAllowance: boolean;
   requests: MyRequest[];
-  types: Record<string, { letter: string; label: string; color: string; deductsVacation: boolean }>;
+  types: Record<string, TypeInfo>;
   requestTypes: string[];
   reportTypes: string[];
   settings: { halfDays: boolean; substitutes: boolean; teamCalendar: boolean; auTracking: boolean };
@@ -139,8 +142,6 @@ export async function loadMeData(
     absentBy.set(row.user_id, [...(absentBy.get(row.user_id) ?? []), row.day]);
   }
 
-  const b = balance.data as Record<string, number | Record<string, number>>;
-  const n = (k: string) => Number(b[k] ?? 0);
   const typeRows = types.data ?? [];
   const s = settings.data!;
   const p = profile.data!;
@@ -155,19 +156,7 @@ export async function loadMeData(
       teamName: (p.teams as unknown as { name: string } | null)?.name ?? "",
     },
     entries,
-    balance: {
-      allowance: n("allowance"),
-      carryover: n("carryover"),
-      carryoverUsed: n("carryover_used"),
-      carryoverExpired: n("carryover_expired"),
-      taken: n("vacation_taken"),
-      pending: n("vacation_pending"),
-      available: n("available"),
-      sick: n("sick_days"),
-      byType: Object.fromEntries(
-        Object.entries((b.by_type ?? {}) as Record<string, number>).map(([k, v]) => [k, Number(v)]),
-      ),
-    },
+    balance: parseBalance(balance.data),
     hasAllowance: !!allowance.data,
     requests: (requests.data ?? []).map((r) => ({
       id: r.id,
@@ -201,5 +190,25 @@ export async function loadMeData(
       workdays: m.workdays,
       absent: absentBy.get(m.user_id) ?? [],
     })),
+  };
+}
+
+/** The row from balance_of() as numbers. */
+export function parseBalance(row: unknown): MyBalance {
+  const b = (row ?? {}) as Record<string, number | Record<string, number>>;
+  const n = (k: string) => Number(b[k] ?? 0);
+  return {
+    allowance: n("allowance"),
+    carryover: n("carryover"),
+    carryoverUsed: n("carryover_used"),
+    carryoverExpired: n("carryover_expired"),
+    taken: n("vacation_taken"),
+    pending: n("vacation_pending"),
+    remaining: n("remaining"),
+    available: n("available"),
+    sick: n("sick_days"),
+    byType: Object.fromEntries(
+      Object.entries((b.by_type ?? {}) as Record<string, number>).map(([k, v]) => [k, Number(v)]),
+    ),
   };
 }

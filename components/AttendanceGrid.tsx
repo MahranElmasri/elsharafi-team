@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { listDays, saveNote, setAu, setCell, type GridResult } from "@/app/actions/grid";
+import { openRequest } from "@/components/admin/ApprovalsDrawer";
 import { GridMenu, type MenuActions } from "@/components/GridMenu";
 import { Stamp } from "@/components/Stamp";
 import { formatDays } from "@/lib/dates";
@@ -36,6 +37,7 @@ export interface GridEntry {
   status: "pending" | "approved";
   half: "am" | "pm" | null;
   auReceived: boolean;
+  requestId?: string | null;
 }
 
 export interface GridType {
@@ -160,6 +162,8 @@ export function AttendanceGrid({ data }: { data: GridData }) {
     const key = `${person.id}|${column.key}`;
     const step = nextInCycle(entries[key]);
     if (step.kind === "pending") {
+      const id = entries[key]?.requestId;
+      if (id) return openRequest(id);
       return setToast("Für diesen Tag liegt ein offener Antrag vor. Entscheiden Sie im Antrag.");
     }
     if (step.kind === "menu") {

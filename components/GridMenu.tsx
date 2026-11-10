@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { openRequest } from "@/components/admin/ApprovalsDrawer";
 import { Stamp } from "@/components/Stamp";
 import type { GridEntry, GridType } from "@/components/AttendanceGrid";
 
@@ -104,9 +105,25 @@ export function GridMenu({
       <h3 className="px-2 pt-1.5 pb-1 text-sm font-bold">{title}</h3>
 
       {pending ? (
-        <p className="mx-2 mb-2 text-[13px] text-ink-2">
-          Beantragt. Entscheiden Sie im Antrag unter „Offene Anträge“.
-        </p>
+        <>
+          <p className="mx-2 mb-2 text-[13px] text-ink-2">
+            Beantragt. Entscheiden Sie im Antrag unter „Offene Anträge“.
+          </p>
+          {entry?.requestId && (
+            <button
+              data-mi
+              role="menuitem"
+              className={item}
+              onClick={() => {
+                const id = entry.requestId!;
+                actions.close();
+                openRequest(id);
+              }}
+            >
+              Antrag öffnen
+            </button>
+          )}
+        </>
       ) : (
         <>
           <div className="max-h-[260px] overflow-auto">

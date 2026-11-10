@@ -54,7 +54,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T13 Employee page** (Req R7, R8, R11, R12)
   - Work: `PersonView`, `YearCalendar`, `RequestList`, `/me` forms, Team tab.
   - Verify: e2e: request + sick report; works at 375 px
-- [ ] **T14 Approvals panel** (Req R9, R10, R17)
+- [x] **T14 Approvals panel** (Req R9, R10, R17)
   - Work: `PendingRequests`, `MissingAu`, `/admin/employees/[id]`.
   - Verify: e2e: ⚠ conflict shown → approve
 - [ ] **T15 Notifications** (Req R18)

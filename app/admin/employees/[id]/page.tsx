@@ -3,9 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { saveEmployee } from "@/app/actions/employees";
 import { AppHeader } from "@/components/AppHeader";
+import { BalanceFigures } from "@/components/BalanceDetails";
+import { RequestList } from "@/components/me/RequestList";
 import { FormMessage } from "@/components/FormMessage";
 import { WorkdayCircles } from "@/components/WorkdayCircles";
 import { labels } from "@/lib/labels";
+import { parseBalance } from "@/lib/me-data";
+import { loadPersonRequests } from "@/lib/requests-data";
 import { requireUser } from "@/lib/session";
 import { createServerClient } from "@/lib/supabase/server";
 import { EmployeeForm } from "../EmployeeForm";
@@ -49,6 +53,11 @@ export default async function EmployeePage({
       .maybeSingle(),
   ]);
   if (!person) notFound();
+  const [{ data: balanceRow, error: balanceError }, history] = await Promise.all([
+    supabase.rpc("balance_of", { p_user: id, p_year: year }).single(),
+    loadPersonRequests(id, year),
+  ]);
+  if (balanceError) throw new Error(balanceError.message);
   const isMe = person.id === me.id;
 
   return (
@@ -69,6 +78,26 @@ export default async function EmployeePage({
           </p>
           {neu && <FormMessage ok={L.created} />}
         </header>
+
+        <Section title={`Abwesenheiten ${year}`}>
+          <nav className="flex gap-4 text-sm" aria-label="Jahr der Abwesenheiten">
+            <Link href={`?jahr=${year - 1}`} className="btn-plain">
+              {year - 1}
+            </Link>
+            <Link href={`?jahr=${year + 1}`} className="btn-plain">
+              {year + 1}
+            </Link>
+          </nav>
+          <div className="grid gap-8 sm:grid-cols-[minmax(0,16rem)_1fr]">
+            <BalanceFigures balance={parseBalance(balanceRow)} types={history.types} />
+            <RequestList
+              requests={history.requests}
+              types={history.types}
+              year={year}
+              mode="admin"
+            />
+          </div>
+        </Section>
 
         <Section title={L.login}>
           <InvitePanel id={person.id} active={person.active} />
@@ -125,7 +154,7 @@ export default async function EmployeePage({
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="grid gap-4 border-t-2 border-ink pt-6">
+    <section aria-label={title} className="grid gap-4 border-t-2 border-ink pt-6">
       <h2 className="text-xl font-bold">{title}</h2>
       {children}
     </section>

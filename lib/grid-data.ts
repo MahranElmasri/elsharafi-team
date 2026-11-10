@@ -19,7 +19,7 @@ export async function loadGridData(year: number, month: number): Promise<GridDat
         .order("full_name"),
       supabase
         .from("absence_days")
-        .select("user_id, day, type, status, half, au_received")
+        .select("user_id, day, type, status, half, au_received, request_id")
         .gte("day", from)
         .lte("day", to),
       supabase
@@ -62,6 +62,7 @@ export async function loadGridData(year: number, month: number): Promise<GridDat
       status: d.status,
       half: d.half,
       auReceived: d.au_received,
+      requestId: d.request_id,
     };
     withEntries.add(d.user_id);
   }

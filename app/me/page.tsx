@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Fragment } from "react";
 import { AppHeader } from "@/components/AppHeader";
+import { BalanceFigures, dayCount } from "@/components/BalanceDetails";
 import { MeActions } from "@/components/me/MeActions";
 import { MonthCalendar } from "@/components/me/MonthCalendar";
 import { RequestList } from "@/components/me/RequestList";
@@ -15,7 +15,7 @@ import { requireUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: `Meine Abwesenheiten – ${labels.practice}` };
 
-const days = (n: number) => `${formatDays(n)} ${n === 1 ? "Tag" : "Tage"}`;
+const days = dayCount;
 
 export default async function MePage({
   searchParams,
@@ -36,10 +36,6 @@ export default async function MePage({
   const arrow = "grid size-[34px] place-items-center rounded-full border border-rule bg-sheet";
   const tab = (on: boolean) =>
     `-mb-px border-b-[3px] px-3.5 py-2.5 font-bold ${on ? "border-ink text-ink" : "border-transparent text-ink-2"}`;
-  const others = Object.entries(b.byType).filter(
-    ([code, n]) =>
-      n > 0 && !data.types[code]?.deductsVacation && code !== "sick" && code !== "child_sick",
-  );
 
   return (
     <>
@@ -68,34 +64,9 @@ export default async function MePage({
           )}
           <details className="mt-1 text-sm">
             <summary className="cursor-pointer text-ink-2">Alle Zahlen für {data.year}</summary>
-            <dl className="mt-2 grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 tabular-nums">
-              <dt>Anspruch</dt>
-              <dd>{days(b.allowance)}</dd>
-              <dt>Aus dem Vorjahr</dt>
-              <dd>{days(b.carryover)}</dd>
-              {b.carryover > 0 && (
-                <>
-                  <dt className="pl-3 text-ink-2">davon bis 31.3. genommen</dt>
-                  <dd>{days(b.carryoverUsed)}</dd>
-                  <dt className="pl-3 text-ink-2">davon verfallen</dt>
-                  <dd>{days(b.carryoverExpired)}</dd>
-                </>
-              )}
-              <dt>Genommen</dt>
-              <dd>{days(b.taken)}</dd>
-              <dt>Beantragt</dt>
-              <dd>{days(b.pending)}</dd>
-              <dt className="font-bold">Noch verfügbar</dt>
-              <dd className="font-bold">{days(b.available)}</dd>
-              <dt>Krankheitstage</dt>
-              <dd>{days(b.sick)}</dd>
-              {others.map(([code, n]) => (
-                <Fragment key={code}>
-                  <dt>{data.types[code]?.label ?? code}</dt>
-                  <dd>{days(n)}</dd>
-                </Fragment>
-              ))}
-            </dl>
+            <div className="mt-2">
+              <BalanceFigures balance={b} types={data.types} />
+            </div>
           </details>
         </section>
 
@@ -153,7 +124,7 @@ export default async function MePage({
           <h2 id="mine-h" className="text-lg font-bold">
             Meine Anträge {data.year}
           </h2>
-          <RequestList data={data} />
+          <RequestList requests={data.requests} types={data.types} year={data.year} mode="own" />
         </section>
       </main>
     </>
