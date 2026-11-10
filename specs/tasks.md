@@ -48,7 +48,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T11 Grid view** (Req R2)
   - Work: `AttendanceGrid` (read only): month, search, tabs, counts, lines, holidays, today, hatching.
   - Verify: Vitest for the column builder; manual check with 45 rows
-- [ ] **T12 Grid editing** (Req R2, R4, R17)
+- [x] **T12 Grid editing** (Req R2, R4, R17)
   - Work: click cycle (optimistic), right-click menu, notes, AU, count popover.
   - Verify: Vitest for the cycle; e2e for a grid click
 - [ ] **T13 Employee page** (Req R7, R8, R11, R12)

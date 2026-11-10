@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { berlinToday, buildColumns, parseMonth, shiftMonth, stampTilt, worksOn } from "@/lib/grid";
+import {
+  berlinToday,
+  buildColumns,
+  groupDays,
+  nextInCycle,
+  parseMonth,
+  shiftMonth,
+  stampTilt,
+  worksOn,
+} from "@/lib/grid";
 
 const holidays2026 = new Map([
   ["2026-12-25", "1. Weihnachtstag"],
@@ -57,5 +66,39 @@ describe("month navigation", () => {
   it("tilts stamps the same way every time, within ±4°", () => {
     expect(stampTilt("a|2026-11-10")).toBe(stampTilt("a|2026-11-10"));
     expect(Math.abs(stampTilt("b|2026-11-11"))).toBeLessThanOrEqual(4);
+  });
+});
+
+describe("click cycle", () => {
+  it("goes empty → X → U → empty", () => {
+    expect(nextInCycle(undefined)).toEqual({ kind: "set", type: "sick" });
+    expect(nextInCycle({ type: "sick", status: "approved" })).toEqual({
+      kind: "set",
+      type: "vacation",
+    });
+    expect(nextInCycle({ type: "vacation", status: "approved" })).toEqual({
+      kind: "set",
+      type: null,
+    });
+  });
+  it("leaves pending requests and other types alone", () => {
+    expect(nextInCycle({ type: "vacation", status: "pending" })).toEqual({ kind: "pending" });
+    expect(nextInCycle({ type: "training", status: "approved" })).toEqual({ kind: "menu" });
+  });
+});
+
+describe("groupDays", () => {
+  it("joins consecutive weekdays across weekends into ranges", () => {
+    expect(
+      groupDays([
+        "2026-11-05",
+        "2026-11-06",
+        "2026-11-09",
+        "2026-11-12",
+        "2026-11-30",
+        "2026-12-01",
+      ]),
+    ).toBe("5.–9.11., 12.11., 30.11.–1.12.");
+    expect(groupDays([])).toBe("");
   });
 });

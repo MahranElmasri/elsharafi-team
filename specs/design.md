@@ -88,7 +88,7 @@ components/                    → AttendanceGrid, PersonView, YearCalendar, Req
                                  PendingRequests, MissingAu, NotificationBell
 lib/supabase/{server,browser,admin}.ts · lib/mail.ts · lib/settings.ts (reads app_settings + visible types for the UI) · lib/invites.ts (create / hash / redeem) · lib/dates.ts · lib/labels.ts (German text)
 supabase/migrations/ (schema + reference data: teams, absence types, settings row) · supabase/seed.sql (local test users only) · supabase/tests/ (pgTAP)
-lib/employees.ts (form parsing) · lib/people.ts (last sign-in per account) · lib/grid.ts (month columns, display helpers) · lib/grid-data.ts (loads one month for the grid: entries, holidays, notes, missing AU, balances, team load)
+lib/employees.ts (form parsing) · lib/people.ts (last sign-in per account) · lib/grid.ts (month columns, display helpers) · lib/grid-data.ts (loads one month for the grid: entries, holidays, notes, missing AU, balances, team load) · app/actions/grid.ts (setCell, saveNote, setAu, listDays: thin wrappers over the SQL functions) · components/GridMenu.tsx (cell context menu)
 tests/ (Vitest) · e2e/ (Playwright; 2 workers and a 15 s expect timeout against the dev server) · scripts/ (create-admin, import-praxisplan) · specs/
 ```
 
@@ -184,7 +184,7 @@ Other types use muted inks (green `#2F7A55`, violet `#6A4C9C`, brown `#8A5A2B`, 
 - No all-caps labels, no monospace, sentence case everywhere.
 
 **Layout:**
-- **Admin:** `/admin?monat=YYYY-MM` (default: this month in Berlin time). One continuous ruled sheet; no cards. Group tabs (default "Alle") and the name search filter on the client. With a group tab selected, the day header shows "n von max" in red when more people are absent than `max_absent` allows. The Rest count shows "–" when no allowance is entered for the year. The name column is sticky and holds the weekday circles plus the X / U / Rest counts. A week line follows each Friday, and the month start is marked. "Offene Anträge" opens as a drawer from the right, so the grid keeps its width.
+- **Admin:** `/admin?monat=YYYY-MM` (default: this month in Berlin time). One continuous ruled sheet; no cards. Group tabs (default "Alle") and the name search filter on the client. With a group tab selected, the day header shows "n von max" in red when more people are absent than `max_absent` allows. The Rest count shows "–" when no allowance is entered for the year. Editing (T12): a click shows the change at once and rolls it back with the database's German message if refused; after the last pending save the page refreshes from the server. Plain click cycles frei → X → U → frei; on another type it opens the menu, on a pending day it points to the request. Right-click, the context-menu key or Shift+F10 opens the menu; arrow keys move between cells. The X and U counts open the dates behind them. The name column is sticky and holds the weekday circles plus the X / U / Rest counts. A week line follows each Friday, and the month start is marked. "Offene Anträge" opens as a drawer from the right, so the grid keeps its width.
 - **Staff (phone first):**
   - A plain sentence, "Sie haben noch 14 Urlaubstage", with "beantragt" and "genommen" beneath it.
   - The weekday circles.

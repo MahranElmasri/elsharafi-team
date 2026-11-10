@@ -22,7 +22,10 @@ export async function loadGridData(year: number, month: number): Promise<GridDat
         .select("user_id, day, type, status, half, au_received")
         .gte("day", from)
         .lte("day", to),
-      supabase.from("absence_types").select("code, letter, label, color"),
+      supabase
+        .from("absence_types")
+        .select("code, letter, label, color, visible, sort")
+        .order("sort"),
       supabase.from("day_notes").select("user_id, day, note").gte("day", from).lte("day", to),
       supabase.rpc("missing_au"),
       supabase.rpc("balances", { p_year: year }),
@@ -54,7 +57,12 @@ export async function loadGridData(year: number, month: number): Promise<GridDat
   const entries: Record<string, GridEntry> = {};
   const withEntries = new Set<string>();
   for (const d of days.data ?? []) {
-    entries[`${d.user_id}|${d.day}`] = { type: d.type, status: d.status, half: d.half };
+    entries[`${d.user_id}|${d.day}`] = {
+      type: d.type,
+      status: d.status,
+      half: d.half,
+      auReceived: d.au_received,
+    };
     withEntries.add(d.user_id);
   }
 
@@ -113,6 +121,7 @@ export async function loadGridData(year: number, month: number): Promise<GridDat
     types: Object.fromEntries(
       (types.data ?? []).map((t) => [t.code, { letter: t.letter, label: t.label, color: t.color }]),
     ),
+    menuTypes: (types.data ?? []).filter((t) => t.visible).map((t) => t.code),
     teams: (teams.data ?? []).map((t) => ({ id: t.id, name: t.name, maxAbsent: t.max_absent })),
     load: Object.fromEntries(
       ((load.data ?? []) as Load[]).map((l) => [`${l.team_id}|${l.day}`, l.absent_count]),

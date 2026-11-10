@@ -103,3 +103,52 @@ export function stampTilt(key: string): number {
   for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) | 0;
   return (Math.abs(h) % 9) - 4; // −4° … +4°
 }
+
+/** What a plain click does to a cell (R2): empty → X → U → empty. */
+export type CycleStep =
+  | { kind: "set"; type: "sick" | "vacation" | null }
+  | { kind: "pending" } // decided in the request, not in the grid
+  | { kind: "menu" }; // another type: choose in the menu instead of overwriting it
+
+export function nextInCycle(entry: { type: string; status: string } | undefined): CycleStep {
+  if (!entry) return { kind: "set", type: "sick" };
+  if (entry.status === "pending") return { kind: "pending" };
+  if (entry.type === "sick") return { kind: "set", type: "vacation" };
+  if (entry.type === "vacation") return { kind: "set", type: null };
+  return { kind: "menu" };
+}
+
+/** "2.–6.11., 9.11." — runs of consecutive weekdays shown as ranges. Keys must be sorted. */
+export function groupDays(keys: string[]): string {
+  const parts: string[] = [];
+  let start: string | null = null;
+  let prev: string | null = null;
+  const nextWeekday = (key: string) => {
+    const d = new Date(`${key}T12:00:00Z`);
+    do d.setUTCDate(d.getUTCDate() + 1);
+    while (d.getUTCDay() === 0 || d.getUTCDay() === 6);
+    return d.toISOString().slice(0, 10);
+  };
+  const flush = () => {
+    if (start && prev) parts.push(formatShortRange(start, prev));
+  };
+  for (const key of keys) {
+    if (prev && nextWeekday(prev) === key) {
+      prev = key;
+      continue;
+    }
+    flush();
+    start = key;
+    prev = key;
+  }
+  flush();
+  return parts.join(", ");
+}
+
+function formatShortRange(a: string, b: string) {
+  const [, am, ad] = a.split("-").map(Number);
+  const [, bm, bd] = b.split("-").map(Number);
+  if (a === b) return `${ad}.${am}.`;
+  if (am === bm) return `${ad}.–${bd}.${bm}.`;
+  return `${ad}.${am}.–${bd}.${bm}.`;
+}

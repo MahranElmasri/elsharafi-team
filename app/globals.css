@@ -262,6 +262,9 @@ body {
       color-mix(in srgb, var(--c) 30%, transparent) 50%
     );
   }
+  .stamp.press {
+    animation: stamp-press 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  }
   .stamp .half-mark {
     position: absolute;
     top: -7px;
@@ -272,5 +275,24 @@ body {
     padding: 0 3px;
     font-size: 10px;
     line-height: 14px;
+  }
+}
+
+@keyframes stamp-press {
+  0% {
+    transform: rotate(var(--r, 0deg)) scale(1.6);
+    opacity: 0;
+  }
+  55% {
+    transform: rotate(var(--r, 0deg)) scale(0.9);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(var(--r, 0deg)) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stamp.press {
+    animation: none;
   }
 }

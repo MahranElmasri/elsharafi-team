@@ -8,6 +8,7 @@ export function Stamp({
   half = null,
   tilt = 0,
   showHalfMark = true,
+  press = false,
 }: {
   letter: string;
   color: string; // a colour token such as "--urlaub"
@@ -15,8 +16,9 @@ export function Stamp({
   half?: "am" | "pm" | null;
   tilt?: number;
   showHalfMark?: boolean;
+  press?: boolean; // just stamped: a short press animation
 }) {
-  const cls = ["stamp", pending && "pending", half, letter.length > 1 && "two"]
+  const cls = ["stamp", pending && "pending", half, letter.length > 1 && "two", press && "press"]
     .filter(Boolean)
     .join(" ");
   const style = { "--c": `var(${color})`, "--r": `${tilt}deg` } as CSSProperties;
