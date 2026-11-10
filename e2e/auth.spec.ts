@@ -47,7 +47,7 @@ test("signed-out visitors are sent to the login page", async ({ page }) => {
 test("an admin logs in to /admin and logs out again", async ({ page }) => {
   await logIn(page, boss.username, boss.password);
   await expect(page).toHaveURL(/\/admin$/);
-  await expect(page.getByRole("heading", { name: "Übersicht" })).toBeVisible();
+  await expect(page.getByRole("table")).toBeVisible(); // the month grid
 
   await page.getByRole("button", { name: "Abmelden" }).click();
   await expect(page).toHaveURL(/\/login$/);
