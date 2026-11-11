@@ -57,7 +57,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T14 Approvals panel** (Req R9, R10, R17)
   - Work: `PendingRequests`, `MissingAu`, `/admin/employees/[id]`.
   - Verify: e2e: ⚠ conflict shown → approve
-- [ ] **T15 Notifications** (Req R18)
+- [x] **T15 Notifications** (Req R18)
   - Work: `NotificationBell` (Realtime), `lib/mail.ts`, wire up the actions.
   - Verify: Vitest for templates; e2e: the bell updates live
 - [ ] **T16 Reminders endpoint** (Req R15)

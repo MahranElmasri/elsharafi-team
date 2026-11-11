@@ -31,6 +31,7 @@ pg_cron ─► retention purge (SQL)  ·  pg_net ─► POST {APP_URL}/api/cron/
   - "Passwort vergessen" uses the same mechanism (`purpose = reset`): the link is sent by nodemailer, at most 1 per 15 minutes per person, and the page always gives the same answer.
   - SQL functions (service role only): `create_invite(user, purpose, hash, by)` · `request_reset(username, hash)` (returns the email target, or nothing when the account is unknown, inactive, has no email, or asked within 15 minutes) · `peek_invite(hash)` (`ok` / `unknown` / `used` / `expired` / `inactive`, for the page) · `redeem_invite(hash)` (the atomic update above).
   - `lib/mail.ts` never throws. Without `SMTP_HOST` it writes the mail to the server log in development and logs an error in production.
+  - Notification emails (T15): `sendAll` wraps each row an RPC returns with `renderNotification`: "Guten Tag,", the message from SQL, "Zur App: {APP_URL}{link}" (only for in-app paths), and a no-reply footer. Rows without an address are skipped.
 
 ## 4. Data model (`supabase/migrations`)
 | Table | Key columns | Notes |
@@ -85,8 +86,8 @@ app/einladung/[token] (set password) · app/passwort-vergessen
 app/admin/export (xlsx route) · app/admin/backup (json route) · app/api/cron/reminders
 app/actions.ts                 → server actions: RPC → email → revalidate
 components/                    → AttendanceGrid, GridMenu, BalanceDetails, admin/ApprovalsDrawer, me/{MeActions, MonthCalendar, TeamCalendar, RequestList},
-                                 NotificationBell (T15)
-lib/supabase/{server,browser,admin}.ts · lib/mail.ts · lib/settings.ts (reads app_settings + visible types for the UI) · lib/invites.ts (create / hash / redeem) · lib/dates.ts · lib/labels.ts (German text)
+                                 NotificationBell (T15: "Meldungen n" in the header for everyone; the latest 20, live via Realtime INSERTs filtered to the user; opening it marks all read. Only the bell is live: pages are not re-synced, a notification's link opens its page with fresh data.)
+lib/supabase/{server,browser,admin}.ts · lib/notifications.ts + lib/notice.ts (bell data) · lib/mail.ts · lib/settings.ts (reads app_settings + visible types for the UI) · lib/invites.ts (create / hash / redeem) · lib/dates.ts · lib/labels.ts (German text)
 supabase/migrations/ (schema + reference data: teams, absence types, settings row) · supabase/seed.sql (local test users only) · supabase/tests/ (pgTAP)
 lib/employees.ts (form parsing) · lib/people.ts (last sign-in per account) · lib/grid.ts (month columns, display helpers) · lib/grid-data.ts (loads one month for the grid: entries, holidays, notes, missing AU, balances, team load) · app/actions/grid.ts (setCell, saveNote, setAu, listDays: thin wrappers over the SQL functions) · components/GridMenu.tsx (cell context menu)
 tests/ (Vitest) · e2e/ (Playwright; 2 workers and a 15 s expect timeout against the dev server) · scripts/ (create-admin, import-praxisplan) · specs/
@@ -126,7 +127,7 @@ npm run dev | build | lint | format | typecheck
 npm test                 # vitest run
 npm run test:e2e         # playwright (local Supabase + dev server; runs in the installed Google Chrome,
                          #   because Playwright's Chromium does not support macOS 13)
-npx supabase start       # local stack (Docker)
+npx supabase start       # local stack (Docker); Realtime must run for the bell (do not exclude it with -x)
 npx supabase test db     # pgTAP
 npx supabase db reset    # re-apply migrations + seed locally
 npx supabase db push --db-url "$SUPABASE_DB_URL"   # production — ask first

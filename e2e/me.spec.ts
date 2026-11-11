@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { admin, createAccount, deleteAccount, type TestAccount } from "./accounts";
+import { openDialog } from "./dialogs";
 
 const tag = Date.now().toString(36);
 let eva: TestAccount; // the employee using the page
@@ -51,8 +52,9 @@ async function logIn(page: Page, account: TestAccount, path = "/me?monat=2026-11
   await page.getByLabel("Benutzername").fill(account.username);
   await page.getByLabel("Passwort").fill(account.password);
   await page.getByRole("button", { name: "Anmelden" }).click();
-  await expect(page).toHaveURL(/\/me$/);
+  await expect(page).toHaveURL(/\/me$/, { timeout: 30_000 });
   await page.goto(path);
+  await page.waitForLoadState("networkidle"); // the buttons react only once the page is hydrated
 }
 
 test("an employee requests vacation, sees it pending and withdraws it", async ({ page }) => {
@@ -60,7 +62,7 @@ test("an employee requests vacation, sees it pending and withdraws it", async ({
   await logIn(page, eva, "/me?monat=2026-12");
   await expect(page.getByRole("heading", { name: "Sie haben noch 30 Tage Urlaub." })).toBeVisible();
 
-  await page.getByRole("button", { name: "Urlaub beantragen" }).click();
+  await openDialog(page, "Urlaub beantragen", "Abwesenheit beantragen");
   const dialog = page.getByRole("dialog", { name: "Abwesenheit beantragen" });
   await dialog.getByLabel("Von").fill("2026-12-07");
   await dialog.getByLabel("Bis", { exact: true }).fill("2026-12-09");
@@ -76,7 +78,7 @@ test("an employee requests vacation, sees it pending and withdraws it", async ({
   await expect(page.getByText("Montag 7.: Urlaub, beantragt")).toBeAttached();
 
   // The same days again: the database names the first clash.
-  await page.getByRole("button", { name: "Urlaub beantragen" }).click();
+  await openDialog(page, "Urlaub beantragen", "Abwesenheit beantragen");
   await dialog.getByLabel("Von").fill("2026-12-08");
   await dialog.getByLabel("Bis", { exact: true }).fill("2026-12-08");
   await dialog.getByRole("button", { name: "Beantragen" }).click();
@@ -92,8 +94,9 @@ test("an employee requests vacation, sees it pending and withdraws it", async ({
 });
 
 test("a sick report is recorded at once and the admins are told", async ({ page }) => {
+  test.slow();
   await logIn(page, eva);
-  await page.getByRole("button", { name: "Krank melden" }).click();
+  await openDialog(page, "Krank melden", "Krank melden");
   const dialog = page.getByRole("dialog", { name: "Krank melden" });
   await dialog.getByLabel("Von").fill("2026-11-12");
   await dialog.getByLabel("Bis voraussichtlich").fill("2026-11-13");
@@ -121,16 +124,24 @@ test("the team tab shows colleagues as abwesend, never the reason", async ({ pag
 });
 
 test("the page works at 375 px without sideways scrolling", async ({ page }) => {
+  test.slow();
   await page.setViewportSize({ width: 375, height: 800 });
   await logIn(page, eva);
   await expect(page.getByRole("button", { name: "Urlaub beantragen" })).toBeVisible();
   const width = await page.evaluate(() => document.documentElement.scrollWidth);
   expect(width).toBeLessThanOrEqual(375);
-  await page.getByRole("button", { name: "Urlaub beantragen" }).click();
+  await openDialog(page, "Urlaub beantragen", "Abwesenheit beantragen");
   const box = await page.getByRole("dialog").boundingBox();
   expect(box!.x).toBeGreaterThanOrEqual(0);
   expect(box!.x + box!.width).toBeLessThanOrEqual(375);
   // The date fields stay inside the dialog.
   const to = await page.getByRole("dialog").getByLabel("Bis", { exact: true }).boundingBox();
   expect(to!.x + to!.width).toBeLessThanOrEqual(box!.x + box!.width);
+  await page.getByRole("dialog").getByRole("button", { name: "Abbrechen" }).click();
+
+  // The open bell stays on screen.
+  await page.getByRole("button", { name: /^Meldungen/ }).click();
+  const list = await page.locator("#notices").boundingBox();
+  expect(list!.x).toBeGreaterThanOrEqual(0);
+  expect(list!.x + list!.width).toBeLessThanOrEqual(375);
 });

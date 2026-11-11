@@ -9,9 +9,15 @@ const newUsername = `neu.${stamp}`;
 test.beforeAll(async () => {
   boss = await createAccount("leitung", "admin");
   withEntries = await createAccount("eintrag", "employee");
+  // New accounts start today; the entry must lie after the start date and on a workday.
   await admin
+    .from("profiles")
+    .update({ start_date: "2020-01-01", workdays: [1, 2, 3, 4, 5] })
+    .eq("id", withEntries.id);
+  const { error } = await admin
     .from("absence_days")
     .insert({ user_id: withEntries.id, day: "2026-11-10", type: "sick" });
+  if (error) throw error;
 });
 
 test.afterAll(async () => {

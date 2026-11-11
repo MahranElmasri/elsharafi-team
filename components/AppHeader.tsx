@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { logout } from "@/app/actions/auth";
+import { NotificationBell } from "@/components/NotificationBell";
 import { labels } from "@/lib/labels";
+import { loadNotices } from "@/lib/notifications";
 import type { CurrentUser } from "@/lib/session";
 
-export function AppHeader({ user }: { user: CurrentUser }) {
+export async function AppHeader({ user }: { user: CurrentUser }) {
+  const notices = await loadNotices();
   return (
     <header className="border-b border-rule bg-sheet print:hidden">
       <div className="mx-auto flex max-w-screen-2xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3">
@@ -23,6 +26,7 @@ export function AppHeader({ user }: { user: CurrentUser }) {
           )}
         </div>
         <div className="flex items-center gap-4">
+          <NotificationBell userId={user.id} initial={notices} />
           <span className="hidden text-ink-2 sm:inline">{user.fullName}</span>
           <form action={logout}>
             <button type="submit" className="btn-plain">

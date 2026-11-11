@@ -50,12 +50,45 @@ export async function sendMail(mail: Mail): Promise<boolean> {
   }
 }
 
-/** Sends the emails an RPC returned ([{to, subject, text}]). Failures are logged, never thrown. */
+/** A notification row from an RPC: {to, subject, text, link?}. */
+export interface NotificationMail extends Mail {
+  link?: string | null;
+}
+
+/**
+ * Wraps a notification's text for email (R18): greeting, the message, a link back to the
+ * page it is about, and a footer. The wording of the message itself comes from SQL.
+ */
+export function renderNotification(mail: NotificationMail, appUrl: string): Mail {
+  const base = appUrl.replace(/\/+$/, "");
+  const link = mail.link && mail.link.startsWith("/") ? `${base}${mail.link}` : null;
+  const text = [
+    "Guten Tag,",
+    "",
+    mail.text.trim(),
+    ...(link ? ["", `Zur App: ${link}`] : []),
+    "",
+    "MVZ El-Sharafi",
+    "Diese Nachricht wurde automatisch verschickt. Bitte antworten Sie nicht darauf.",
+  ].join("\n");
+  return { to: mail.to, subject: mail.subject, text };
+}
+
+function isNotificationMail(m: unknown): m is NotificationMail {
+  const x = m as Record<string, unknown> | null;
+  return (
+    typeof x?.to === "string" &&
+    x.to.includes("@") &&
+    typeof x.subject === "string" &&
+    typeof x.text === "string"
+  );
+}
+
+/** Sends the emails an RPC returned. Rows without an address are skipped; failures are logged. */
 export async function sendAll(mails: unknown): Promise<void> {
   if (!Array.isArray(mails)) return;
+  const appUrl = process.env.APP_URL ?? "http://localhost:3000";
   await Promise.all(
-    mails
-      .filter((m): m is Mail => typeof m?.to === "string" && typeof m?.subject === "string")
-      .map((m) => sendMail({ to: m.to, subject: m.subject, text: m.text })),
+    mails.filter(isNotificationMail).map((m) => sendMail(renderNotification(m, appUrl))),
   );
 }

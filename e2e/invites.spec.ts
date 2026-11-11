@@ -43,6 +43,7 @@ test("an invite link sets the password, signs in, and works only once", async ({
   await expect(page).toHaveURL(/\/me$/);
 
   await page.getByRole("button", { name: "Abmelden" }).click();
+  await expect(page).toHaveURL(/\/login$/); // logged out before the next navigation
   await page.goto(link.path);
   await expect(alertIn(page)).toHaveText(
     "Dieser Link wurde schon benutzt. Bitten Sie die Praxisleitung um einen neuen Link.",
