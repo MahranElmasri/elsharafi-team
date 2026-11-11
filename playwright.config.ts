@@ -6,6 +6,9 @@ if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 
 export default defineConfig({
   testDir: "e2e",
+  // Saves the practice's switches, turns them all on for the run, restores them afterwards.
+  globalSetup: "./e2e/global-setup.ts",
+  globalTeardown: "./e2e/global-teardown.ts",
   // The dev server compiles each page on first use; 5 s is too tight under parallel load.
   expect: { timeout: 15_000 },
   // One dev server serves every browser; more than two at once makes logins time out.

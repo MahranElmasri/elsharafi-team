@@ -1,6 +1,8 @@
 -- T1 Core schema (R1, R3, R19, R24, R25)
 begin;
 select plan(20);
+-- The switches can be changed in the app; the tests assume all on (rolled back at the end).
+update public.app_settings set team_calendar = true, half_days = true, substitutes = true, au_tracking = true;
 
 -- Start from an empty practice; everything is rolled back at the end, so local data is untouched.
 delete from absence_days; delete from leave_requests; delete from closure_days; delete from audit_log;
@@ -10,7 +12,10 @@ delete from auth.users;
 select is((select count(*)::int from teams), 3, 'three teams are seeded');
 select is((select count(*)::int from absence_types), 15, 'fifteen absence types are seeded');
 select is((select count(*)::int from absence_types where is_fixed), 3, 'Urlaub, Betriebsurlaub, Krank are fixed');
-select ok((select team_calendar and half_days and substitutes and au_tracking from app_settings),
+-- The live row can be switched in the app (R24); a fresh install starts with every switch on.
+select ok((select bool_and(column_default = 'true') from information_schema.columns
+            where table_schema = 'public' and table_name = 'app_settings'
+              and column_name in ('team_calendar', 'half_days', 'substitutes', 'au_tracking')),
           'all feature switches start on');
 
 -- Account trigger

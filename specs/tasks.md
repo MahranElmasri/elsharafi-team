@@ -69,7 +69,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T17b Settings page** (Req R24, R25, R26)
   - Work: `/admin/settings` (4 switches + absence-type table with add, edit and show/hide), `lib/settings.ts`, hide the switched-off parts in the grid, `/me` and the request forms, the range-entry form on `/admin/employees/[id]`.
   - Verify: e2e: switching off half days removes the ½ option everywhere; switching off the team calendar removes the Team tab; hiding a type removes it from the menu while old cells still show it; Elternzeit entered for 3 months shows in the grid.
-- [ ] **T18 Export & backup** (Req R21)
+- [x] **T18 Export & backup** (Req R21)
   - Work: the xlsx and json routes.
   - Verify: e2e download; the file opens and matches the grid
 

@@ -49,7 +49,16 @@ export default async function AdminPage({
               ›
             </Link>
           </div>
-          <ApprovalsDrawer data={approvals} />
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Plain links: these are file downloads, not pages. */}
+            <a href={`/admin/export?jahr=${year}`} className="btn-plain" download>
+              Excel {year}
+            </a>
+            <a href="/admin/backup" className="btn-plain" download>
+              Datensicherung
+            </a>
+            <ApprovalsDrawer data={approvals} />
+          </div>
         </div>
         <AttendanceGrid data={data} />
       </main>

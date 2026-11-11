@@ -1,6 +1,8 @@
 -- T2 Calendar (R5, R6)
 begin;
 select plan(9);
+-- The switches can be changed in the app; the tests assume all on (rolled back at the end).
+update public.app_settings set team_calendar = true, half_days = true, substitutes = true, au_tracking = true;
 
 -- Start from an empty practice; everything is rolled back at the end, so local data is untouched.
 delete from absence_days; delete from leave_requests; delete from closure_days; delete from audit_log;
