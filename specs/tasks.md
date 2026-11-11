@@ -60,7 +60,7 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T15 Notifications** (Req R18)
   - Work: `NotificationBell` (Realtime), `lib/mail.ts`, wire up the actions.
   - Verify: Vitest for templates; e2e: the bell updates live
-- [ ] **T16 Reminders endpoint** (Req R15)
+- [x] **T16 Reminders endpoint** (Req R15)
   - Work: `api/cron/reminders` with a `CRON_SECRET` check: calls `run_reminders`, sends the emails, then `log_reminder_email` for each one sent.
   - Verify: `curl` with the secret writes `reminder_log`; a wrong secret gets 401
 - [ ] **T17 Closures & audit pages** (Req R16, R20)

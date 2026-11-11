@@ -1,6 +1,6 @@
 -- T8 Reminders, retention, scheduled jobs (R15, R20)
 begin;
-select plan(17);
+select plan(19);
 
 -- Start from an empty practice; everything is rolled back at the end, so local data is untouched.
 delete from absence_days; delete from leave_requests; delete from closure_days; delete from audit_log;
@@ -37,6 +37,10 @@ select results_eq($$select kind, days_at_risk from due_reminders('2026-02-02')$$
 select is((select count(*)::int from due_reminders('2026-04-01') where kind = 'carryover'), 0, 'no carry-over reminder after 31.3.');
 select is((select jsonb_array_length(run_reminders('2026-10-01'))), 1, 'run_reminders returns one email');
 select is((select count(*)::int from reminder_log where channel = 'in_app'), 1, 'the in-app reminder is logged');
+select is((select for_month from reminder_log where channel = 'in_app'), '2026-10-01'::date,
+  'the log records the month the reminder is for, not the real send time');
+select is((select count(*)::int from due_reminders('2026-10-20')), 0,
+  'nothing is due twice in the same month, whatever the clock says');
 reset role;
 update reminder_log set sent_at = '2026-10-01 08:00+02';
 set local role service_role;
