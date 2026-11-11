@@ -80,7 +80,7 @@ All functions use `set search_path = public`, revoke `anon`, and run an explicit
 
 ## 6. Project structure
 ```
-app/login · app/me · app/admin · app/admin/employees (list, add, team limits) · app/admin/employees/[id] (T10: details, allowance, invite, account; T14 adds the person view) · app/admin/closures · app/admin/audit
+app/login · app/me · app/admin · app/admin/employees (list, add, team limits) · app/admin/employees/[id] (T10: details, allowance, invite, account; T14 adds the person view) · app/admin/closures (T17: `?jahr=`; form Von/Bis/Notiz → `set_closure`, reports the days added and lists skipped entries; the year's closures as ranges with "Entfernen" after a confirm → `remove_closure`) · app/admin/audit (T17: newest first, 50 per page `?seite=`, filters `?bereich=` table and `?person=` id; columns Zeit, Wer, Bereich, Was, Änderung; formatting in `lib/audit.ts`). Admin nav: Übersicht, Mitarbeitende, Schließungen, Protokoll.
 app/admin/settings (feature switches + absence types)
 app/einladung/[token] (set password) · app/passwort-vergessen
 app/admin/export (xlsx route) · app/admin/backup (json route) · app/api/cron/reminders

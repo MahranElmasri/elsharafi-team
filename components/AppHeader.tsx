@@ -22,6 +22,12 @@ export async function AppHeader({ user }: { user: CurrentUser }) {
               <Link href="/admin/employees" className="btn-plain">
                 {labels.nav.employees}
               </Link>
+              <Link href="/admin/closures" className="btn-plain">
+                {labels.nav.closures}
+              </Link>
+              <Link href="/admin/audit" className="btn-plain">
+                {labels.nav.audit}
+              </Link>
             </nav>
           )}
         </div>

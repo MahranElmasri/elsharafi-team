@@ -32,7 +32,12 @@ export const labels = {
     inactive: "Ihr Konto ist deaktiviert. Bitte wenden Sie sich an die Praxisleitung.",
     toLogin: "Zur Anmeldung",
   },
-  nav: { overview: "Übersicht", employees: "Mitarbeitende" },
+  nav: {
+    overview: "Übersicht",
+    employees: "Mitarbeitende",
+    closures: "Schließungen",
+    audit: "Protokoll",
+  },
   roles: { employee: "Mitarbeiter/in", admin: "Praxisleitung" },
   employees: {
     title: "Mitarbeitende",
