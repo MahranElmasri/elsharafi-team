@@ -1,4 +1,5 @@
 import { buildColumns, dayKey, type DayColumn } from "@/lib/grid";
+import { loadSettings, type Settings } from "@/lib/settings";
 import { createServerClient } from "@/lib/supabase/server";
 
 export interface MyEntry {
@@ -44,7 +45,7 @@ export interface MeData {
   types: Record<string, TypeInfo>;
   requestTypes: string[];
   reportTypes: string[];
-  settings: { halfDays: boolean; substitutes: boolean; teamCalendar: boolean; auTracking: boolean };
+  settings: Settings;
   /** Colleagues from the same group; empty when the team calendar is switched off (R11). */
   team: { id: string; name: string; workdays: number[]; absent: string[] }[];
 }
@@ -92,26 +93,12 @@ export async function loadMeData(
         .from("absence_types")
         .select("code, letter, label, color, entry_mode, visible, deducts_vacation, sort")
         .order("sort"),
-      supabase
-        .from("app_settings")
-        .select("half_days, substitutes, team_calendar, au_tracking")
-        .single(),
+      loadSettings(supabase),
       supabase.rpc("team_members"),
       supabase.rpc("team_calendar", { a: from, b: to }),
     ]);
 
-  const firstError = [
-    holidays,
-    profile,
-    days,
-    balance,
-    allowance,
-    requests,
-    types,
-    settings,
-    members,
-    team,
-  ]
+  const firstError = [holidays, profile, days, balance, allowance, requests, types, members, team]
     .map((r) => r.error)
     .find(Boolean);
   if (firstError) throw new Error(firstError.message);
@@ -143,7 +130,6 @@ export async function loadMeData(
   }
 
   const typeRows = types.data ?? [];
-  const s = settings.data!;
   const p = profile.data!;
 
   return {
@@ -178,12 +164,7 @@ export async function loadMeData(
       .filter((t) => t.visible && t.entry_mode === "request")
       .map((t) => t.code),
     reportTypes: typeRows.filter((t) => t.visible && t.entry_mode === "report").map((t) => t.code),
-    settings: {
-      halfDays: s.half_days,
-      substitutes: s.substitutes,
-      teamCalendar: s.team_calendar,
-      auTracking: s.au_tracking,
-    },
+    settings,
     team: memberRows.map((m) => ({
       id: m.user_id,
       name: m.full_name,

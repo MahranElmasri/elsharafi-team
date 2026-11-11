@@ -17,5 +17,10 @@ export default defineConfig({
     // Playwright's bundled Chromium does not run on macOS 13; use the installed Chrome.
     channel: "chrome",
   },
+  projects: [
+    { name: "app", testIgnore: /settings\.spec\.ts/ },
+    // Practice-wide switches would disturb tests running at the same time, so this goes last.
+    { name: "settings", testMatch: /settings\.spec\.ts/, dependencies: ["app"] },
+  ],
   webServer: { command: "npm run dev", url: "http://localhost:3000", reuseExistingServer: true },
 });

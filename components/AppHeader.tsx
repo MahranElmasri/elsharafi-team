@@ -15,7 +15,7 @@ export async function AppHeader({ user }: { user: CurrentUser }) {
             {labels.appName} <span className="font-normal text-pencil">{labels.practice}</span>
           </p>
           {user.role === "admin" && (
-            <nav className="flex gap-4" aria-label="Bereiche">
+            <nav className="flex flex-wrap gap-x-4 gap-y-1" aria-label="Bereiche">
               <Link href="/admin" className="btn-plain">
                 {labels.nav.overview}
               </Link>
@@ -27,6 +27,9 @@ export async function AppHeader({ user }: { user: CurrentUser }) {
               </Link>
               <Link href="/admin/audit" className="btn-plain">
                 {labels.nav.audit}
+              </Link>
+              <Link href="/admin/settings" className="btn-plain">
+                {labels.nav.settings}
               </Link>
             </nav>
           )}

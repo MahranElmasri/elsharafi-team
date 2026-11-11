@@ -37,6 +37,7 @@ export const labels = {
     employees: "Mitarbeitende",
     closures: "Schließungen",
     audit: "Protokoll",
+    settings: "Einstellungen",
   },
   roles: { employee: "Mitarbeiter/in", admin: "Praxisleitung" },
   employees: {

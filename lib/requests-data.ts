@@ -1,4 +1,5 @@
 import { parseBalance, type MyRequest, type TypeInfo } from "@/lib/me-data";
+import { loadSettings } from "@/lib/settings";
 import { createServerClient } from "@/lib/supabase/server";
 
 export interface PendingRequest {
@@ -60,10 +61,10 @@ export async function loadApprovals(): Promise<ApprovalsData> {
     supabase.rpc("request_over_limit"),
     supabase.rpc("request_limit_warnings"),
     supabase.rpc("missing_au"),
-    supabase.from("app_settings").select("au_tracking").single(),
+    loadSettings(supabase),
     loadTypes(supabase),
   ]);
-  const firstError = [requests, conflicts, overLimit, limits, missing, settings]
+  const firstError = [requests, conflicts, overLimit, limits, missing]
     .map((r) => r.error)
     .find(Boolean);
   if (firstError) throw new Error(firstError.message);
@@ -174,7 +175,7 @@ export async function loadApprovals(): Promise<ApprovalsData> {
       missing: m.missing,
     })),
     types,
-    auTracking: settings.data!.au_tracking,
+    auTracking: settings.auTracking,
   };
 }
 

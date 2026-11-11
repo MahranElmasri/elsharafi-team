@@ -16,6 +16,7 @@ import { EmployeeForm } from "../EmployeeForm";
 import { AccountPanel } from "./AccountPanel";
 import { AllowanceForm } from "./AllowanceForm";
 import { InvitePanel } from "./InvitePanel";
+import { RangeForm } from "./RangeForm";
 
 const L = labels.employees;
 
@@ -36,22 +37,24 @@ export default async function EmployeePage({
   const year = /^\d{4}$/.test(jahr ?? "") ? Number(jahr) : thisYear;
 
   const supabase = await createServerClient();
-  const [{ data: person }, { data: teams }, { data: allowance }] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select(
-        "id, full_name, username, notify_email, team_id, role, active, workdays, start_date, end_date",
-      )
-      .eq("id", id)
-      .maybeSingle(),
-    supabase.from("teams").select("id, name").order("sort"),
-    supabase
-      .from("leave_allowances")
-      .select("days, carryover")
-      .eq("user_id", id)
-      .eq("year", year)
-      .maybeSingle(),
-  ]);
+  const [{ data: person }, { data: teams }, { data: allowance }, { data: types }] =
+    await Promise.all([
+      supabase
+        .from("profiles")
+        .select(
+          "id, full_name, username, notify_email, team_id, role, active, workdays, start_date, end_date",
+        )
+        .eq("id", id)
+        .maybeSingle(),
+      supabase.from("teams").select("id, name").order("sort"),
+      supabase
+        .from("leave_allowances")
+        .select("days, carryover")
+        .eq("user_id", id)
+        .eq("year", year)
+        .maybeSingle(),
+      supabase.from("absence_types").select("code, label").eq("visible", true).order("sort"),
+    ]);
   if (!person) notFound();
   const [{ data: balanceRow, error: balanceError }, history] = await Promise.all([
     supabase.rpc("balance_of", { p_user: id, p_year: year }).single(),
@@ -97,6 +100,14 @@ export default async function EmployeePage({
               mode="admin"
             />
           </div>
+        </Section>
+
+        <Section title="Zeitraum eintragen">
+          <RangeForm
+            id={person.id}
+            today={new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Berlin" })}
+            types={types ?? []}
+          />
         </Section>
 
         <Section title={L.login}>

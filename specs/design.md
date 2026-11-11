@@ -81,7 +81,7 @@ All functions use `set search_path = public`, revoke `anon`, and run an explicit
 ## 6. Project structure
 ```
 app/login · app/me · app/admin · app/admin/employees (list, add, team limits) · app/admin/employees/[id] (T10: details, allowance, invite, account; T14 adds the person view) · app/admin/closures (T17: `?jahr=`; form Von/Bis/Notiz → `set_closure`, reports the days added and lists skipped entries; the year's closures as ranges with "Entfernen" after a confirm → `remove_closure`) · app/admin/audit (T17: newest first, 50 per page `?seite=`, filters `?bereich=` table and `?person=` id; columns Zeit, Wer, Bereich, Was, Änderung; formatting in `lib/audit.ts`). Admin nav: Übersicht, Mitarbeitende, Schließungen, Protokoll.
-app/admin/settings (feature switches + absence types)
+app/admin/settings (T17b: four switches (`role=switch`) that save on click via an `app_settings` update (admin RLS); absence-type table, one expandable form per type (Bezeichnung, Zeichen, Farbe from the six inks, Eingetragen von, Zieht Urlaub ab, Gesundheitsdaten, Grenze Tage/Jahre, Reihenfolge, Sichtbar) → `save_absence_type`; fixed types show only label, letter, colour and order; "Löschen" for unused non-fixed types → `delete_absence_type`; "Neue Art" derives the immutable code from the label (umlauts transliterated, `_2` added on a clash, so an existing type is never overwritten)) · `/admin/employees/[id]` gets "Zeitraum eintragen" (T17b: Art (visible types), Von, Bis; "Eintragen" → `set_absence_range`, "Entfernen" → `clear_absence_range`; lists skipped days and, after entering, warns "x von y Tagen genutzt" from `type_usage` when a limit is exceeded). Admin nav adds Einstellungen.
 app/einladung/[token] (set password) · app/passwort-vergessen
 app/admin/export (xlsx route) · app/admin/backup (json route) · app/api/cron/reminders
 app/actions.ts                 → server actions: RPC → email → revalidate
@@ -119,7 +119,9 @@ export async function requestLeave(input: RequestLeaveInput): Promise<ActionResu
 | End-to-end | Playwright (`e2e/`) | Login; invite → set password; used/expired link refused; request → ⚠ conflict → approve → bell; sick report; grid click; deactivate blocks login; export |
 | Data | `import-praxisplan --dry-run` | Old vs. new totals per employee |
 
-Each pgTAP file first empties the tables inside its own transaction (rolled back at the end), so local data never affects the result. Tests are written red → green, alongside each task. A failing test is never deleted or weakened without approval.
+Each pgTAP file first empties the tables inside its own transaction (rolled back at the end), so local data never affects the result. `e2e/settings.spec.ts` switches practice-wide settings, so Playwright runs it as its own project after all other tests (`dependencies`), never alongside them.
+
+Tests are written red → green, alongside each task. A failing test is never deleted or weakened without approval.
 
 ## 9. Commands
 ```bash

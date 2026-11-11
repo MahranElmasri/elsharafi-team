@@ -1,5 +1,6 @@
 import type { GridData, GridEntry, GridPerson } from "@/components/AttendanceGrid";
 import { berlinToday, buildColumns, dayKey } from "@/lib/grid";
+import { loadSettings } from "@/lib/settings";
 import { createServerClient } from "@/lib/supabase/server";
 
 /** Everything the admin grid shows for one month, read as the signed-in admin (RLS applies). */
@@ -31,21 +32,10 @@ export async function loadGridData(year: number, month: number): Promise<GridDat
       supabase.rpc("balances", { p_year: year }),
       supabase.from("teams").select("id, name, sort, max_absent").order("sort"),
       supabase.rpc("team_day_load", { a: from, b: to }),
-      supabase.from("app_settings").select("half_days, au_tracking").single(),
+      loadSettings(supabase),
     ]);
 
-  const firstError = [
-    holidays,
-    profiles,
-    days,
-    types,
-    notes,
-    missing,
-    balances,
-    teams,
-    load,
-    settings,
-  ]
+  const firstError = [holidays, profiles, days, types, notes, missing, balances, teams, load]
     .map((r) => r.error)
     .find(Boolean);
   if (firstError) throw new Error(firstError.message);
@@ -128,6 +118,6 @@ export async function loadGridData(year: number, month: number): Promise<GridDat
       ((load.data ?? []) as Load[]).map((l) => [`${l.team_id}|${l.day}`, l.absent_count]),
     ),
     year,
-    settings: { halfDays: settings.data!.half_days, auTracking: settings.data!.au_tracking },
+    settings: { halfDays: settings.halfDays, auTracking: settings.auTracking },
   };
 }
