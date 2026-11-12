@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/session";
 import { createServerClient } from "@/lib/supabase/server";
 import { SwitchList } from "./SwitchList";
 import { TypeForm, type TypeRow } from "./TypeForm";
+import { TypeVisibleSwitch } from "./TypeVisibleSwitch";
 
 export const metadata: Metadata = { title: `Einstellungen – ${labels.practice}` };
 
@@ -50,8 +51,11 @@ export default async function SettingsPage() {
           </p>
           <ul className="grid gap-2">
             {rows.map((t) => (
-              <li key={t.code} className="rounded-xl border border-rule bg-sheet">
-                <details>
+              <li
+                key={t.code}
+                className="flex items-start gap-2 rounded-xl border border-rule bg-sheet"
+              >
+                <details className="min-w-0 flex-1">
                   <summary
                     className={`flex cursor-pointer flex-wrap items-center gap-3 p-3 ${t.visible ? "" : "text-pencil"}`}
                   >
@@ -70,6 +74,11 @@ export default async function SettingsPage() {
                     <TypeForm type={t} />
                   </div>
                 </details>
+                {!t.is_fixed && (
+                  <div className="p-3">
+                    <TypeVisibleSwitch code={t.code} label={t.label} visible={t.visible} />
+                  </div>
+                )}
               </li>
             ))}
           </ul>

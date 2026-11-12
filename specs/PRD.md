@@ -33,12 +33,13 @@ One online app where:
 |---|---|---|
 | Access | Username login, invite link (email or QR) to set your own password, Passwort vergessen, activate/deactivate | R1, R19, R23 |
 | Admin grid | The familiar month grid: click cycle X → U → empty, right-click menu, notes, counts with drill-down, holiday/today/month/week markers | R2 |
-| Absence types | Admin-managed list (add, rename, letter/colour, show/hide). Starts with Urlaub, Betriebsurlaub, Krank, Kind krank, Fortbildung, Bildungsurlaub, Sonderurlaub (Hochzeit, Geburt, Todesfall, Umzug, sonstige), Überstundenabbau, Unbezahlter Urlaub, Elternzeit, Mutterschutz. Optional limits per type; half days; admin range entry for long periods. | R3, R4, R25, R26 |
+| Absence types | Admin-managed list (add, rename, letter/colour, show/hide). Starts with Urlaub, Betriebsurlaub, Krank, Kind krank, Fortbildung, Bildungsurlaub, Sonderurlaub (Hochzeit, Geburt, Todesfall, Umzug, sonstige), Überstundenabbau, Unbezahlter Urlaub, Elternzeit, Mutterschutz. Optional limits per type; a one-click Sichtbar switch per type (e.g. each Sonderurlaub); half days; admin range entry for long periods. | R3, R4, R25, R26 |
 | Correct counting | Part-time weekdays, Berlin holidays, closure days | R5, R6, R16 |
 | Requests | Request with substitute → pending → approve/deny/cancel; direct sick report | R7–R9 |
 | Team awareness | Same-category conflicts, staffing limit per category, team calendar showing only "abwesend" | R10, R11 |
 | Balances & law | Balances, pro-rata allowance (§5 BUrlG), carry-over expiry 31.3., reminders (BAG employer notice) with log, AU tracking (§5 EFZG) | R12–R15, R17 |
-| Notifications | Live bell + SMTP email | R18 |
+| Notifications | Live bell + SMTP email; the open page (grid, request count, calendar) updates when a notification arrives | R18 |
+| Mobile app (PWA) | Installable on the phone's home screen (opens full screen); push notifications on the phone, also when the app is closed, after opting in per device | R27 |
 | Privacy | Audit log, 3-year deletion of health data, sick details visible to admins only | R20 |
 | Data | Excel export, JSON backup, one-time import of 2026 from PraxisPlan | R21, R22 |
 | Settings | Admin page "Einstellungen" with on/off switches for team calendar, half days, substitute, AU tracking | R24 |
@@ -46,7 +47,7 @@ One online app where:
 ## 4a. First login & forgotten password
 1. The admin creates the employee (name, username, optional email, team, …).
 2. The admin clicks **"Einladung erstellen"**, which makes a one-time link valid for 7 days:
-   - **Employee has an email:** the link is emailed automatically.
+   - **Employee has an email:** the link is emailed automatically. The email shows the username, the steps to set the password, a button with the link, and the same QR code, so it can be opened on the phone by scanning it from the computer screen.
    - **No email:** the screen shows the link plus a QR code to print, scan from the admin's screen, or forward on WhatsApp.
 3. The employee opens the link and sets their own password (at least 10 characters, entered twice). They are then logged in, and the link stops working.
 4. From then on they log in with **username + password**. The admin never sets or sees a password.
@@ -79,7 +80,7 @@ Absence types are shown or hidden one by one on the same page. A hidden type dis
 - Everything ships at once (no phased rollout).
 
 ## 7. Not doing
-Print view, blackout periods, a second language, approval for sick days, rotating or shift schedules, hourly absences, time tracking, shift planning, payroll integration, eAU retrieval, iCal, PWA, statistics, live grid sync, WhatsApp/SMS, a SmartQ link, two-factor login (not wanted; revisit if admin accounts are ever compromised). Reasons are in `requirements.md` §4.
+Print view, blackout periods, a second language, approval for sick days, rotating or shift schedules, hourly absences, time tracking, shift planning, payroll integration, eAU retrieval, iCal, offline use, statistics, live sync of every grid edit (only notified changes update live, R18), WhatsApp/SMS, a SmartQ link, two-factor login (not wanted; revisit if admin accounts are ever compromised). Reasons are in `requirements.md` §4.
 
 ## 8. Risks
 | Risk | Mitigation |
@@ -96,4 +97,9 @@ Print view, blackout periods, a second language, approval for sick days, rotatin
 | 1.1 | 2026-11-10 | First login via invite link (email/QR), self-service reset, no admin-set passwords |
 | 1.2 | 2026-11-10 | Settings page with feature switches; admin-managed absence types; new types Bildungsurlaub, Sonderurlaub subtypes, Unbezahlter Urlaub, Elternzeit, Mutterschutz; admin range entry |
 | 1.3 | 2026-11-10 | UI design direction "pencil and ink" (design.md §11), "Sie" voice, clickable prototype before T11 |
+| 1.4 | 2026-11-11 | A new request, sick report, decision or cancellation shows on the receiver's open page (admin grid, `/me` calendar) without a reload |
+| 1.5 | 2026-11-11 | One-click show/hide switch on each absence type's row in Einstellungen (e.g. each Sonderurlaub type) |
+| 1.6 | 2026-11-11 | App icon: a coloured calendar replaces the default Next.js favicon |
+| 1.7 | 2026-11-11 | PWA: installable app plus web push notifications (moved out of "Not doing"); offline use stays out |
+| 1.8 | 2026-11-11 | Invite email: username, step-by-step instructions, link button and QR code |
 

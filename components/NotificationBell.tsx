@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { markNoticesRead } from "@/app/actions/notifications";
+import { PushToggle } from "@/components/PushToggle";
 import { toNotice, type Notice } from "@/lib/notice";
+import { registerServiceWorker } from "@/lib/push-client";
 import { createBrowserClient } from "@/lib/supabase/browser";
 
 const when = new Intl.DateTimeFormat("de-DE", {
@@ -14,7 +17,7 @@ const when = new Intl.DateTimeFormat("de-DE", {
   minute: "2-digit",
 });
 
-/** "Meldungen": the latest notifications, updated live through Realtime (R18). */
+/** "Meldungen": the latest notifications, updated live through Realtime; each one also refreshes the page (R18). */
 export function NotificationBell({
   userId,
   initial,
@@ -27,12 +30,15 @@ export function NotificationBell({
   const [open, setOpen] = useState(false);
   const [announce, setAnnounce] = useState("");
   const ref = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   // A page load brings the server's list.
   useEffect(() => {
     setNotices(initial.notices);
     setUnread(initial.unread);
   }, [initial]);
+
+  useEffect(registerServiceWorker, []);
 
   useEffect(() => {
     const supabase = createBrowserClient();
@@ -56,7 +62,8 @@ export function NotificationBell({
             setNotices((list) => [notice, ...list.filter((n) => n.id !== notice.id)].slice(0, 20));
             setUnread((n) => n + 1);
             setAnnounce(`Neue Meldung: ${notice.message}`);
-            // Only the bell is live; pages are not re-synced (PRD: no live grid sync).
+            // Reload the open page's server data so the grid and calendars show the change (R18).
+            router.refresh();
           },
         )
         .subscribe();
@@ -65,7 +72,7 @@ export function NotificationBell({
       cancelled = true;
       if (channel) void supabase.removeChannel(channel);
     };
-  }, [userId]);
+  }, [userId, router]);
 
   useEffect(() => {
     if (!open) return;
@@ -120,6 +127,7 @@ export function NotificationBell({
           className="fixed inset-x-3 top-24 z-50 rounded-xl sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mt-2 sm:w-[360px] border border-rule bg-sheet p-2 shadow-[0_12px_32px_rgba(29,43,52,0.32)]"
         >
           <h2 className="px-2 pt-1.5 pb-1 text-sm font-bold">Meldungen</h2>
+          <PushToggle />
           {notices.length === 0 ? (
             <p className="px-2 pb-2 text-sm text-ink-2">
               Noch keine Meldungen. Hier erscheinen Anträge, Entscheidungen und Erinnerungen.

@@ -1,9 +1,13 @@
-import nodemailer, { type Transporter } from "nodemailer";
+import nodemailer, { type SendMailOptions, type Transporter } from "nodemailer";
 
 export interface Mail {
   to: string;
   subject: string;
+  /** Always set: mail apps without HTML show this. */
   text: string;
+  html?: string;
+  /** Inline images use `cid` and are referenced in the HTML as `cid:…`. */
+  attachments?: SendMailOptions["attachments"];
 }
 
 let transport: Transporter | null | undefined;

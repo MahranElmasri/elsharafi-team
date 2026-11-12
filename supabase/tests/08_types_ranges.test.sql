@@ -3,6 +3,8 @@ begin;
 select plan(15);
 -- The switches can be changed in the app; the tests assume all on (rolled back at the end).
 update public.app_settings set team_calendar = true, half_days = true, substitutes = true, au_tracking = true;
+-- Types can be hidden in the app; the tests assume all visible (rolled back at the end).
+update public.absence_types set visible = true where not is_fixed;
 
 -- Start from an empty practice; everything is rolled back at the end, so local data is untouched.
 delete from absence_days; delete from leave_requests; delete from closure_days; delete from audit_log;

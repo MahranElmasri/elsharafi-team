@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import QRCode from "qrcode";
 import { authEmail, parseDays, parseEmployeeForm, TEAMS } from "@/lib/employees";
-import { createInvite } from "@/lib/invites";
+import { createInvite, inviteMail } from "@/lib/invites";
 import { labels } from "@/lib/labels";
 import { sendMail } from "@/lib/mail";
 import { requireUser } from "@/lib/session";
@@ -156,11 +156,15 @@ export async function createInviteFor(id: string): Promise<InviteResult> {
   const qrSvg = await QRCode.toString(invite.url, { type: "svg", margin: 1, width: 220 });
   let emailedTo: string | undefined;
   if (person.notify_email) {
-    const sent = await sendMail({
-      to: person.notify_email,
-      subject: L.inviteMailSubject,
-      text: L.inviteMailText(person.full_name, person.username, invite.url),
-    });
+    const sent = await sendMail(
+      await inviteMail({
+        to: person.notify_email,
+        name: person.full_name,
+        username: person.username,
+        url: invite.url,
+        expiresAt: invite.expiresAt,
+      }),
+    );
     if (sent) emailedTo = person.notify_email;
   }
   return { url: invite.url, qrSvg, expiresAt: invite.expiresAt, emailedTo };

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { logout } from "@/app/actions/auth";
+import { LogoutButton } from "@/components/LogoutButton";
 import { NotificationBell } from "@/components/NotificationBell";
 import { labels } from "@/lib/labels";
 import { loadNotices } from "@/lib/notifications";
@@ -37,11 +37,7 @@ export async function AppHeader({ user }: { user: CurrentUser }) {
         <div className="flex items-center gap-4">
           <NotificationBell userId={user.id} initial={notices} />
           <span className="hidden text-ink-2 sm:inline">{user.fullName}</span>
-          <form action={logout}>
-            <button type="submit" className="btn-plain">
-              {labels.logout}
-            </button>
-          </form>
+          <LogoutButton />
         </div>
       </div>
     </header>

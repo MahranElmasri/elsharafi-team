@@ -62,11 +62,17 @@ export async function saveType(_prev: FormState, form: FormData): Promise<FormSt
     return { error: "Zeitraum: 1 oder 2 Jahre." };
 
   let code = String(form.get("code") ?? "");
-  const { data: existing, error: listError } = await supabase.from("absence_types").select("code");
+  const { data: existing, error: listError } = await supabase
+    .from("absence_types")
+    .select("code, visible");
   if (listError) return { error: listError.message };
   const codes = (existing ?? []).map((t) => t.code as string);
+  // Visibility of an existing type is changed only by its switch (setTypeVisible).
+  let visible = form.get("visible") === "on";
   if (code) {
-    if (!CODE.test(code) || !codes.includes(code)) return { error: "Unbekannte Abwesenheitsart." };
+    const current = existing?.find((t) => t.code === code);
+    if (!CODE.test(code) || !current) return { error: "Unbekannte Abwesenheitsart." };
+    visible = current.visible as boolean;
   } else {
     code = codeFromLabel(label, codes); // never an existing code, so nothing is overwritten
   }
@@ -81,12 +87,46 @@ export async function saveType(_prev: FormState, form: FormData): Promise<FormSt
     p_is_health: form.get("is_health") === "on",
     p_limit_days: days,
     p_limit_years: limitYears === "" ? null : Number(limitYears),
-    p_visible: form.get("visible") === "on",
+    p_visible: visible,
     p_sort: sort,
   });
   if (error) return { error: error.message };
   revalidatePath("/", "layout");
   return { ok: `„${label}“ gespeichert.`, done: Date.now() };
+}
+
+/** Show or hide one non-fixed type from its switch (R25). Every other field stays as stored. */
+export async function setTypeVisible(code: string, visible: boolean): Promise<FormState> {
+  await requireUser("admin");
+  if (!CODE.test(code) || typeof visible !== "boolean")
+    return { error: "Unbekannte Abwesenheitsart." };
+  const supabase = await createServerClient();
+  const { data: t, error: readError } = await supabase
+    .from("absence_types")
+    .select(
+      "code, letter, label, color, entry_mode, deducts_vacation, is_health, limit_days, limit_years, is_fixed, sort",
+    )
+    .eq("code", code)
+    .maybeSingle();
+  if (readError) return { error: readError.message };
+  if (!t) return { error: "Unbekannte Abwesenheitsart." };
+  if (t.is_fixed) return { error: "Feste Arten bleiben immer sichtbar." };
+  const { error } = await supabase.rpc("save_absence_type", {
+    p_code: t.code,
+    p_letter: t.letter,
+    p_label: t.label,
+    p_color: t.color,
+    p_entry_mode: t.entry_mode,
+    p_deducts_vacation: t.deducts_vacation,
+    p_is_health: t.is_health,
+    p_limit_days: t.limit_days,
+    p_limit_years: t.limit_years,
+    p_visible: visible,
+    p_sort: t.sort,
+  });
+  if (error) return { error: error.message };
+  revalidatePath("/", "layout");
+  return { ok: `„${t.label}“ ist ${visible ? "sichtbar" : "ausgeblendet"}.` };
 }
 
 /** Delete a type that was never used (R25). The database refuses used ones. */

@@ -3,6 +3,7 @@
 import { useOptimistic, useState, useTransition } from "react";
 import { setSwitch, type FormState } from "@/app/actions/settings";
 import { FormMessage } from "@/components/FormMessage";
+import { Switch } from "@/components/Switch";
 import { SWITCHES, type Settings } from "@/lib/settings";
 
 /** The four practice-wide switches; each saves on click. */
@@ -24,25 +25,17 @@ export function SwitchList({ settings }: { settings: Settings }) {
                   {s.hint}
                 </p>
               </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={on}
-                aria-label={s.label}
-                aria-describedby={hintId}
-                onClick={() =>
+              <Switch
+                on={on}
+                label={s.label}
+                describedBy={hintId}
+                onToggle={() =>
                   start(async () => {
                     setShown({ ...shown, [s.key]: !on });
                     setMessage(await setSwitch(s.key, !on));
                   })
                 }
-                className={`relative h-7 w-12 shrink-0 rounded-full border-2 border-ink transition-colors ${on ? "bg-ink" : "bg-sheet"}`}
-              >
-                <span
-                  aria-hidden
-                  className={`absolute top-0.5 size-5 rounded-full transition-[left] ${on ? "left-[22px] bg-on-ink" : "left-0.5 bg-ink"}`}
-                />
-              </button>
+              />
             </li>
           );
         })}

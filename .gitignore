@@ -14,3 +14,6 @@ playwright-report
 test-results
 supabase/.temp
 supabase/.branches
+
+# Staff lists with health data (sick-day totals) stay out of git.
+scripts/data/

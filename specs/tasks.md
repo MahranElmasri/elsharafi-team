@@ -45,6 +45,9 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T10 Employee management** (Req R19, R13)
   - Work: `/admin/employees` + admin actions (create, ban, delete, "Einladung erstellen" with link + QR + email), the allowance suggestion, team limits.
   - Verify: e2e: add an employee; deleting someone with entries is refused
+- [x] **T10b Invite email with steps and QR** (Req R23)
+  - Work: `inviteMail()` in `lib/invites.ts` (text + HTML, inline QR PNG); `Mail` gets `html`/`attachments`; `createInviteFor` uses it.
+  - Verify: Vitest: username, steps, link, expiry and the QR attachment are in the mail, and names are escaped; one real send to an own address.
 - [x] **T11 Grid view** (Req R2)
   - Work: `AttendanceGrid` (read only): month, search, tabs, counts, lines, holidays, today, hatching.
   - Verify: Vitest for the column builder; manual check with 45 rows
@@ -69,6 +72,18 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T17b Settings page** (Req R24, R25, R26)
   - Work: `/admin/settings` (4 switches + absence-type table with add, edit and show/hide), `lib/settings.ts`, hide the switched-off parts in the grid, `/me` and the request forms, the range-entry form on `/admin/employees/[id]`.
   - Verify: e2e: switching off half days removes the ½ option everywhere; switching off the team calendar removes the Team tab; hiding a type removes it from the menu while old cells still show it; Elternzeit entered for 3 months shows in the grid.
+- [x] **T15c PWA & push** (Req R27)
+  - Work: migration (`push_subscriptions`, save/delete RPCs, `call_app_endpoint`, notifications trigger); `app/manifest.ts`, `app/apple-icon.png`, 192 px icon; `public/sw.js`; `PushToggle` in the Meldungen panel; `lib/push.ts` + `app/api/push`; middleware paths; `web-push@3.6.7`; local VAPID keys in `.env.local` and local Vault `app_url` = `http://host.docker.internal:3000`; logout first removes this device's push.
+  - Verify: pgTAP: RLS and RPCs, the trigger queues one request only when a recipient has a subscription and Vault is set; Vitest: payload and 404/410 cleanup; e2e: manifest served, `sw.js` registered, toggle shown; the real phone check (needs HTTPS) moves to T20
+- [x] **T17d App icon**
+  - Work: `app/favicon.ico` and `app/icon.png` from the calendar artwork.
+  - Verify: the tab shows the calendar; `/favicon.ico` and the icon link load
+- [x] **T17c Type show/hide switch** (Req R25)
+  - Work: shared `Switch` component; `setTypeVisible` action; a switch on each non-fixed row of Abwesenheitsarten; the form keeps "Sichtbar" for new types only.
+  - Verify: e2e: switching off Sonderurlaub Umzug removes it from the grid menu and the request form; switching on brings it back; fixed types have no switch
+- [x] **T15b Live page update** (Req R18)
+  - Work: the bell calls `router.refresh()` on each Realtime INSERT.
+  - Verify: e2e: a request shows in the admin's open grid and "Offene Anträge" with no reload; an approval shows on the employee's open `/me` with no reload
 - [x] **T18 Export & backup** (Req R21)
   - Work: the xlsx and json routes.
   - Verify: e2e download; the file opens and matches the grid
@@ -79,5 +94,5 @@ Each task gets tests first and is ticked off when done. Each one touches at most
   - Work: the parser and script.
   - Verify: Vitest for the parser; `--dry-run` totals match
 - [ ] **T20 Release** (ask first)
-  - Work: `db push` to production, deploy, set the Vault secrets `app_url` and `cron_secret`, create the admin, real import, full e2e against staging.
+  - Work: `db push` to production, deploy, set the Vault secrets `app_url` and `cron_secret`, the VAPID keys (`npx web-push generate-vapid-keys`) and `VAPID_SUBJECT`, create the admin, real import, full e2e against staging, and a real Android and iPhone (added to the home screen) get a push with the app closed (R27).
   - Verify: every success criterion in `requirements.md` §3

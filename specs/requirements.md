@@ -124,6 +124,8 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
   - a decision or cancellation (to the other party)
   - reminders (to employees)
 - IF a person has no email address, the email is skipped. IF an email fails, it SHALL be logged and the action SHALL still succeed.
+- WHEN an in-app notification arrives, THE SYSTEM SHALL reload the data of the page the person has open, without a full page reload: the admin grid and "Offene Anträge" count show a new request or sick report, and the employee's calendar and request list show a decision or cancellation.
+- The reload SHALL keep open dialogs, typed input and the scroll position.
 
 ### R19 Employee management
 - An admin SHALL be able to add and edit: name, username, email, team, role, working weekdays, start/end date, allowance.
@@ -146,6 +148,7 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 ### R23 Invite & password reset
 - WHEN an admin clicks "Einladung erstellen", THE SYSTEM SHALL create a single-use link valid for 7 days. Any older unused link for that person SHALL stop working.
 - IF the person has an email, THE SYSTEM SHALL email the link. In every case it SHALL show the link plus a QR code to print, scan or share.
+- The invite email SHALL contain the person's username, the steps to set the password (open the link or scan the QR code, enter a password of at least 10 characters twice, save, then log in with username and password), the link, the QR code of the link, and when the link expires. It SHALL also be readable as plain text.
 - WHEN the link is opened, THE SYSTEM SHALL ask for a new password (at least 10 characters, entered twice), save it, sign the person in, and mark the link used.
 - IF the link is used, expired, or belongs to a deactivated account, THE SYSTEM SHALL refuse it with a German message.
 - WHEN someone clicks "Passwort vergessen" and enters a username, THE SYSTEM SHALL always answer the same way, so nobody can find out which usernames exist. If that account has an email, the system SHALL email a new link, at most 1 per 15 minutes. Without an email, the page says "bitte an die Praxisleitung wenden".
@@ -159,6 +162,8 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 ### R25 Absence type management
 - An admin SHALL be able to add a type and edit its label, letter (1–2 characters, unique), colour, "entered by" (request / report / admin), "deducts vacation", "health data", an optional limit (days per 1 or 2 calendar years), and its sort order.
 - An admin SHALL be able to hide or show each type. Hidden types SHALL disappear from forms and menus, while existing entries stay visible and keep counting.
+- WHEN the admin clicks a type's "Sichtbar" switch in the type list, THE SYSTEM SHALL save the new visibility at once, without opening the type's form. Fixed types SHALL have no switch.
+- Saving a type's form SHALL NOT change its visibility; only the switch does (a new type starts visible unless unticked).
 - A type that has entries SHALL NOT be deletable, only hidden.
 - The fixed types Urlaub, Betriebsurlaub and Krank SHALL NOT be hidden or have their rules changed, because the grid click cycle, balances and closures depend on them. Their label and colour can still be changed.
 - WHEN a request or entry would go over a type's limit, THE SYSTEM SHALL warn the admin and show "x of y days used". It SHALL NOT block the entry.
@@ -168,8 +173,17 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 - An admin SHALL be able to enter any visible type for a date range for one employee (e.g. Elternzeit for 12 months). THE SYSTEM SHALL write approved days on that person's working days only, skip days that are already taken, and list them.
 - An admin SHALL be able to remove all of that person's entries of one type within a date range in one step.
 
+### R27 Mobile app (PWA) and push notifications
+- THE SYSTEM SHALL provide a web app manifest and icons so the app can be added to a phone's home screen and opens full screen, without the browser bar.
+- Each person SHALL be able to switch push notifications on or off for the current device in the "Meldungen" panel. Switching on SHALL ask the browser for permission; switching off SHALL remove that device's subscription.
+- WHEN a notification is created for a person (R18), THE SYSTEM SHALL send a push message with its text to each of that person's devices, also when the app is closed. Tapping it SHALL open the app at the notification's link.
+- IF push is not possible on a device (unsupported browser, iPhone not added to the home screen, permission denied), THE SYSTEM SHALL say why instead of showing the switch. The bell and email keep working.
+- IF a device's subscription has expired, THE SYSTEM SHALL delete it. A failed push SHALL NOT affect the action that caused the notification.
+- A person SHALL only be able to read and remove their own device subscriptions.
+- The app SHALL NOT work offline.
+
 ## 3. Success criteria
-- All of R1–R26 are met and covered by the tests in `design.md` §8.
+- All of R1–R27 are met and covered by the tests in `design.md` §8.
 - The import dry-run matches 100%, or every difference is explained.
 - The build, lint, typecheck, unit, pgTAP and e2e checks all pass.
 - On a phone, the employee pages work at 375 px width. On a desktop, the admin grid handles 45 rows × a full month.
@@ -182,8 +196,8 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 - **Approval for sick days:** it doesn't match how they're handled today.
 - **Rotating schedules, hourly absences, time tracking, shift planning, payroll:** these are a different product.
 - **eAU retrieval:** that needs payroll software.
-- **iCal, PWA, sick-rate statistics:** not selected.
-- **Live grid sync, WhatsApp/SMS, a SmartQ link:** low value, a paid API, and a separate concern.
+- **iCal, offline use, sick-rate statistics:** not selected. (The PWA itself was added in v1.5 as R27.)
+- **Live sync of every grid edit, WhatsApp/SMS, a SmartQ link:** low value, a paid API, and a separate concern. Changes that send a notification do update live (R18).
 - **Two-factor login:** not wanted; revisit if admin accounts are ever compromised.
 - **Automatic vacation reduction for Elternzeit (§17 BEEG):** the employer may cut 1/12 of the allowance per full month of Elternzeit, but this is optional and needs written notice. The admin adjusts the allowance by hand.
 - **Per-employee or per-team switches:** all switches apply to the whole practice.
@@ -200,4 +214,8 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 - **v1 (2026-11-10):** first version, from the planning sessions and the screenshots of the current app.
 - **v1.1 (2026-11-10):** R1 changed and R23 added: first login via invite link (email or QR), self-service reset, no admin-set passwords.
 - **v1.2 (2026-11-10):** R3, R4, R7, R11 and R17 changed; R24 Settings, R25 Absence type management and R26 Admin range entry added.
+- **v1.3 (2026-11-11):** R18 changed: an arriving notification reloads the open page's data, so requests and decisions show without a manual reload.
+- **v1.4 (2026-11-11):** R25 changed: a one-click "Sichtbar" switch on each non-fixed type's row.
+- **v1.5 (2026-11-11):** R27 Mobile app (PWA) and push notifications added.
+- **v1.6 (2026-11-11):** R23: the invite email shows the username, the steps, and the QR code.
 

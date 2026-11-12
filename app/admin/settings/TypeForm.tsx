@@ -74,7 +74,6 @@ export function TypeForm({ type }: { type?: TypeRow }) {
           <input type="hidden" name="entry_mode" value={type!.entry_mode} />
           {type!.deducts_vacation && <input type="hidden" name="deducts_vacation" value="on" />}
           {type!.is_health && <input type="hidden" name="is_health" value="on" />}
-          <input type="hidden" name="visible" value="on" />
           <p className="text-[13px] text-ink-2">
             Feste Art: Regeln und Sichtbarkeit bleiben, weil Klick-Folge, Urlaubskonto und
             Schließungen davon abhängen.
@@ -97,10 +96,12 @@ export function TypeForm({ type }: { type?: TypeRow }) {
             </select>
           </label>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
-            <label className={check}>
-              <input type="checkbox" name="visible" defaultChecked={type?.visible ?? true} />
-              Sichtbar
-            </label>
+            {!type && (
+              <label className={check}>
+                <input type="checkbox" name="visible" defaultChecked />
+                Sichtbar
+              </label>
+            )}
             <label className={check}>
               <input
                 type="checkbox"

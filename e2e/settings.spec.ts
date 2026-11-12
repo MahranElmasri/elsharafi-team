@@ -40,6 +40,7 @@ test.afterAll(async () => {
     .eq("id", true);
   await admin.from("absence_days").delete().eq("user_id", ida.id);
   await admin.from("absence_types").delete().eq("label", typeLabel);
+  await admin.from("absence_types").update({ visible: true }).eq("code", "special_move");
   for (const a of [boss, ida]) await deleteAccount(a);
 });
 
@@ -96,6 +97,7 @@ test("switching off half days removes the ½ option everywhere", async ({ page, 
 });
 
 test("switching off the team calendar removes the Team tab", async ({ page, browser }) => {
+  test.slow();
   await logIn(page, boss, /\/admin$/);
   await openSettings(page);
   await flip(page, "Teamkalender", false);
@@ -131,9 +133,7 @@ test("a hidden type leaves the menu while old cells still show it", async ({ pag
 
   await openSettings(page);
   const row = types.getByRole("listitem").filter({ hasText: typeLabel });
-  await row.locator("summary").click();
-  await row.getByLabel("Sichtbar").uncheck();
-  await row.getByRole("button", { name: "Speichern" }).click();
+  await row.getByRole("switch", { name: `${typeLabel} sichtbar` }).click();
   await expect(row.locator("summary")).toContainText("ausgeblendet");
 
   await page.goto("/admin?monat=2026-11");
@@ -149,6 +149,51 @@ test("a hidden type leaves the menu while old cells still show it", async ({ pag
   page.once("dialog", (d) => d.accept());
   await row.getByRole("button", { name: "Löschen" }).click();
   await expect(row.getByRole("alert")).toContainText("kann nur ausgeblendet werden");
+});
+
+test("each Sonderurlaub type can be hidden and shown with one click", async ({ page, browser }) => {
+  test.slow();
+  await logIn(page, boss, /\/admin$/);
+  await openSettings(page);
+  const types = page.getByRole("region", { name: "Abwesenheitsarten" });
+  const umzug = types.getByRole("switch", { name: "Sonderurlaub Umzug sichtbar" });
+  // Fixed types stay visible, so they have no switch.
+  await expect(types.getByRole("switch", { name: "Urlaub sichtbar", exact: true })).toHaveCount(0);
+
+  await expect(umzug).toHaveAttribute("aria-checked", "true");
+  await umzug.click();
+  await expect(umzug).toHaveAttribute("aria-checked", "false");
+  await expect(
+    types.getByRole("listitem").filter({ hasText: "Sonderurlaub Umzug" }).locator("summary"),
+  ).toContainText("ausgeblendet");
+
+  await page.goto("/admin?monat=2026-11");
+  await cell(page, `Ida ${tag}, Donnerstag 26.:`).click({ button: "right" });
+  await expect(page.getByRole("menuitemradio", { name: "Sonderurlaub Hochzeit" })).toBeVisible();
+  await expect(page.getByRole("menuitemradio", { name: "Sonderurlaub Umzug" })).toHaveCount(0);
+  await page.keyboard.press("Escape");
+
+  const idaPage = await browser.newPage();
+  await logIn(idaPage, ida, /\/me$/);
+  await idaPage.waitForLoadState("networkidle");
+  await openDialog(idaPage, "Urlaub beantragen", "Abwesenheit beantragen");
+  const art = idaPage.getByRole("dialog").getByLabel("Art");
+  await expect(art.getByRole("option", { name: "Sonderurlaub Hochzeit" })).toHaveCount(1);
+  await expect(art.getByRole("option", { name: "Sonderurlaub Umzug" })).toHaveCount(0);
+
+  await openSettings(page);
+  await umzug.click();
+  await expect(umzug).toHaveAttribute("aria-checked", "true");
+  await idaPage.reload();
+  await idaPage.waitForLoadState("networkidle");
+  await openDialog(idaPage, "Urlaub beantragen", "Abwesenheit beantragen");
+  await expect(
+    idaPage
+      .getByRole("dialog")
+      .getByLabel("Art")
+      .getByRole("option", { name: "Sonderurlaub Umzug" }),
+  ).toHaveCount(1);
+  await idaPage.close();
 });
 
 test("Elternzeit entered for 3 months shows in the grid and can be removed", async ({ page }) => {

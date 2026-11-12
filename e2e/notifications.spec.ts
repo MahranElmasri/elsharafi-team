@@ -101,19 +101,18 @@ test("a request rings the admin's bell; the decision rings the employee's", asyn
   await dialog.getByRole("button", { name: "Beantragen" }).click();
   await expect(idaPage.getByText(/Beantragt: 2 Arbeitstage/)).toBeVisible();
 
-  // Live on the admin's page: the bell and, after the refresh, the request count.
+  // Live on the admin's open page, with no reload: the bell and the request count (R18).
   await expect(bossPage.getByRole("button", { name: /^Meldungen, \d+ neu$/ })).toBeVisible();
-  await bell(bossPage).click();
-  const item = bossPage.getByRole("list", { name: "Letzte Meldungen" }).getByRole("link", {
-    name: new RegExp(`Ida ${tag} hat Urlaub beantragt: 3\\.12\\.–4\\.12\\.2026`),
-  });
-  await expect(item).toBeVisible();
-
-  // The notification leads to the page, which then shows the new request.
-  await item.click();
   await expect(bossPage.getByRole("button", { name: /^Offene Anträge \d+$/ })).not.toHaveText(
     before!,
   );
+  await bell(bossPage).click();
+  await expect(
+    bossPage.getByRole("list", { name: "Letzte Meldungen" }).getByRole("link", {
+      name: new RegExp(`Ida ${tag} hat Urlaub beantragt: 3\\.12\\.–4\\.12\\.2026`),
+    }),
+  ).toBeVisible();
+  await bell(bossPage).click();
   await bossPage.getByRole("button", { name: /^Offene Anträge \d+$/ }).click();
   await bossPage
     .getByRole("article", { name: `Ida ${tag}` })
@@ -121,16 +120,13 @@ test("a request rings the admin's bell; the decision rings the employee's", asyn
     .click();
   await expect(bossPage.getByRole("dialog").getByRole("status")).toContainText("Genehmigt");
 
+  // Live on the employee's open page, with no reload: the bell and the request list (R18).
   await expect(idaPage.getByRole("button", { name: "Meldungen, 1 neu" })).toBeVisible();
+  await expect(idaPage.getByRole("listitem").filter({ hasText: "Urlaub, 3.–4.12." })).toContainText(
+    "Genehmigt",
+  );
   await bell(idaPage).click();
   await expect(idaPage.getByRole("list", { name: "Letzte Meldungen" })).toContainText(
     "Ihr Antrag Urlaub 3.12.–4.12.2026 wurde genehmigt.",
-  );
-  await idaPage
-    .getByRole("list", { name: "Letzte Meldungen" })
-    .getByRole("link", { name: /Urlaub 3\.12\.–4\.12\.2026 wurde genehmigt/ })
-    .click();
-  await expect(idaPage.getByRole("listitem").filter({ hasText: "Urlaub, 3.–4.12." })).toContainText(
-    "Genehmigt",
   );
 });
