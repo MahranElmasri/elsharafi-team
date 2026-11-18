@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { labels } from "@/lib/labels";
 import type { Mail } from "@/lib/mail";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { appUrl } from "@/lib/app-url";
 
 /** 32 random bytes, base64url: the secret part of an invite or reset link. */
 export function newToken(): string {
@@ -12,10 +13,6 @@ export function newToken(): string {
 /** Only this hash is stored; the token itself exists only in the link. */
 export function hashToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
-}
-
-function appUrl(): string {
-  return (process.env.APP_URL ?? "http://localhost:3000").replace(/\/+$/, "");
 }
 
 export function inviteUrl(token: string): string {

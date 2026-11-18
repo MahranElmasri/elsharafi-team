@@ -3,6 +3,7 @@ import { isAuthorized, parseAsOf } from "@/lib/cron";
 import { berlinToday } from "@/lib/grid";
 import { renderNotification, sendMail, type NotificationMail } from "@/lib/mail";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { appUrl } from "@/lib/app-url";
 
 interface ReminderMail extends NotificationMail {
   user_id: string;
@@ -39,11 +40,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "run_reminders failed" }, { status: 500 });
   }
 
-  const appUrl = process.env.APP_URL ?? "http://localhost:3000";
+  const baseUrl = appUrl();
   let emailsSent = 0;
   let emailsFailed = 0;
   for (const mail of (data ?? []) as ReminderMail[]) {
-    const sent = await sendMail(renderNotification(mail, appUrl));
+    const sent = await sendMail(renderNotification(mail, baseUrl));
     if (!sent) {
       emailsFailed++;
       continue;

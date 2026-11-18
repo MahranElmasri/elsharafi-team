@@ -1,4 +1,5 @@
 import nodemailer, { type SendMailOptions, type Transporter } from "nodemailer";
+import { appUrl } from "@/lib/app-url";
 
 export interface Mail {
   to: string;
@@ -91,8 +92,7 @@ function isNotificationMail(m: unknown): m is NotificationMail {
 /** Sends the emails an RPC returned. Rows without an address are skipped; failures are logged. */
 export async function sendAll(mails: unknown): Promise<void> {
   if (!Array.isArray(mails)) return;
-  const appUrl = process.env.APP_URL ?? "http://localhost:3000";
   await Promise.all(
-    mails.filter(isNotificationMail).map((m) => sendMail(renderNotification(m, appUrl))),
+    mails.filter(isNotificationMail).map((m) => sendMail(renderNotification(m, appUrl()))),
   );
 }
