@@ -41,6 +41,7 @@ test.afterAll(async () => {
   await admin.from("absence_days").delete().eq("user_id", ida.id);
   await admin.from("absence_types").delete().eq("label", typeLabel);
   await admin.from("absence_types").update({ visible: true }).eq("code", "special_move");
+  await admin.from("notify_recipients").delete().like("email", `%${tag}%`);
   for (const a of [boss, ida]) await deleteAccount(a);
 });
 
@@ -230,4 +231,26 @@ test("Elternzeit entered for 3 months shows in the grid and can be removed", asy
     .eq("user_id", ida.id)
     .eq("type", "parental");
   expect(count).toBe(0);
+});
+
+test("an extra email recipient can be added and removed", async ({ page }) => {
+  const email = `praxis-${tag}@example.org`;
+  await logIn(page, boss, /\/admin$/);
+  await openSettings(page);
+  const section = page.getByRole("region", { name: "E-Mail-Empfänger" });
+
+  await section.getByLabel("E-Mail-Adresse").fill(email.toUpperCase());
+  await section.getByRole("button", { name: "Hinzufügen" }).click();
+  await expect(section.getByRole("status")).toHaveText(`${email} bekommt ab jetzt die E-Mails.`);
+  await expect(section.getByRole("list", { name: "E-Mail-Empfänger" })).toContainText(email);
+  await expect(section.getByLabel("E-Mail-Adresse")).toHaveValue("");
+
+  // The same address twice is refused with a message.
+  await section.getByLabel("E-Mail-Adresse").fill(email);
+  await section.getByRole("button", { name: "Hinzufügen" }).click();
+  await expect(section.getByRole("alert")).toHaveText(`${email} steht schon in der Liste.`);
+
+  await section.getByRole("button", { name: `${email} entfernen` }).click();
+  await expect(section.getByRole("status")).toHaveText(`${email} entfernt.`);
+  await expect(section.getByRole("listitem").filter({ hasText: email })).toHaveCount(0);
 });

@@ -25,6 +25,7 @@ export const AREAS: Record<string, string> = {
   app_settings: "Einstellungen",
   absence_types: "Abwesenheitsarten",
   teams: "Gruppen",
+  notify_recipients: "E-Mail-Empfänger",
 };
 
 const ACTION = { INSERT: "angelegt", UPDATE: "geändert", DELETE: "gelöscht" } as const;
@@ -41,6 +42,7 @@ const FIELDS: Record<string, string> = {
   full_name: "Name",
   username: "Benutzername",
   notify_email: "E-Mail",
+  email: "E-Mail",
   role: "Rolle",
   team_id: "Gruppe",
   active: "Aktiv",
@@ -150,6 +152,8 @@ export function describe(e: AuditEntry, lookup: Lookup): string {
       return `${row.label ?? row.code}: ${action}`;
     case "teams":
       return `${row.name ?? row.id}: ${action}`;
+    case "notify_recipients":
+      return `${row.email}: ${action}`;
     default:
       return action;
   }

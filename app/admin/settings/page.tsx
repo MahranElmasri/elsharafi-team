@@ -5,6 +5,7 @@ import { labels } from "@/lib/labels";
 import { loadSettings } from "@/lib/settings";
 import { requireUser } from "@/lib/session";
 import { createServerClient } from "@/lib/supabase/server";
+import { Recipients } from "./Recipients";
 import { SwitchList } from "./SwitchList";
 import { TypeForm, type TypeRow } from "./TypeForm";
 import { TypeVisibleSwitch } from "./TypeVisibleSwitch";
@@ -16,7 +17,7 @@ const MODE = { request: "beantragen", report: "melden", admin: "Praxisleitung" }
 export default async function SettingsPage() {
   const user = await requireUser("admin");
   const supabase = await createServerClient();
-  const [settings, types] = await Promise.all([
+  const [settings, types, recipients] = await Promise.all([
     loadSettings(supabase),
     supabase
       .from("absence_types")
@@ -25,8 +26,10 @@ export default async function SettingsPage() {
       )
       .order("sort")
       .order("label"),
+    supabase.from("notify_recipients").select("email").order("email"),
   ]);
   if (types.error) throw new Error(types.error.message);
+  if (recipients.error) throw new Error(recipients.error.message);
   const rows = (types.data ?? []) as TypeRow[];
 
   return (
@@ -41,6 +44,18 @@ export default async function SettingsPage() {
         <section aria-label="Funktionen" className="grid gap-4 border-t-2 border-ink pt-6">
           <h2 className="text-xl font-bold">Funktionen</h2>
           <SwitchList settings={settings} />
+        </section>
+
+        <section aria-label="E-Mail-Empfänger" className="grid gap-4 border-t-2 border-ink pt-6">
+          <h2 className="text-xl font-bold">E-Mail-Empfänger</h2>
+          <p className="text-sm text-ink-2">
+            Zum Beispiel der Empfang: Diese Adressen erfahren per E-Mail, wer nicht in der Praxis
+            ist. Bei einer Krankmeldung sofort, bei Urlaub und anderen Anträgen erst, wenn die
+            Praxisleitung sie genehmigt hat, und noch einmal, wenn eine genehmigte Abwesenheit
+            storniert wird. Die E-Mail nennt nur Name und Datum, nie den Grund, und enthält keinen
+            Link zur App.
+          </p>
+          <Recipients emails={(recipients.data ?? []).map((r) => r.email as string)} />
         </section>
 
         <section aria-label="Abwesenheitsarten" className="grid gap-4 border-t-2 border-ink pt-6">

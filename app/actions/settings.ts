@@ -201,3 +201,33 @@ export async function rangeEntry(
       : undefined;
   return { ok, warning };
 }
+
+const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+/** Add an extra email recipient for request and sick-report notices (R18). */
+export async function addRecipient(_prev: FormState, form: FormData): Promise<FormState> {
+  await requireUser("admin");
+  const email = String(form.get("email") ?? "")
+    .trim()
+    .toLowerCase();
+  if (!EMAIL.test(email) || email.length > 254) {
+    return { error: "Bitte eine gültige E-Mail-Adresse eingeben, z. B. praxis@beispiel.de." };
+  }
+  const supabase = await createServerClient();
+  const { error } = await supabase.from("notify_recipients").insert({ email });
+  if (error?.code === "23505") return { error: `${email} steht schon in der Liste.` };
+  if (error) return { error: error.message };
+  revalidatePath("/admin/settings");
+  return { ok: `${email} bekommt ab jetzt die E-Mails.`, done: Date.now() };
+}
+
+/** Remove an extra email recipient (R18). */
+export async function removeRecipient(email: string): Promise<FormState> {
+  await requireUser("admin");
+  if (typeof email !== "string" || !EMAIL.test(email)) return { error: "Unbekannte Adresse." };
+  const supabase = await createServerClient();
+  const { error } = await supabase.from("notify_recipients").delete().eq("email", email);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/settings");
+  return { ok: `${email} entfernt.` };
+}

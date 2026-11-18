@@ -15,6 +15,7 @@ const TABLES: Record<string, string[]> = {
   absence_days: ["user_id", "day"],
   closure_days: ["day"],
   day_notes: ["user_id", "day"],
+  notify_recipients: ["email"],
   reminder_log: ["id"],
   audit_log: ["id"],
 };
