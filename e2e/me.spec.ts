@@ -121,6 +121,19 @@ test("the team tab shows colleagues as abwesend, never the reason", async ({ pag
   await expect(finnRow).toContainText("abwesend am 18.");
   await expect(finnRow.getByTitle("18.: abwesend")).toBeVisible();
   await expect(teamList).not.toContainText(/Krank|krank/);
+  // Dates above the columns: one per working day of November 2026 (21), from Mo 2. to Mo 30.
+  const dates = page.getByTestId("team-date");
+  await expect(dates).toHaveCount(21);
+  await expect(dates.first()).toHaveText("M2");
+  await expect(dates.last()).toHaveText("M30");
+
+  // And back again: the "Mein Kalender" tab leaves the team view.
+  await page.getByRole("link", { name: "Mein Kalender" }).click();
+  await expect(page).not.toHaveURL(/ansicht=team/);
+  await expect(page.getByRole("link", { name: "Mein Kalender" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
 });
 
 test("the page works at 375 px without sideways scrolling", async ({ page }) => {

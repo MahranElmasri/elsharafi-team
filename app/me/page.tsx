@@ -30,8 +30,9 @@ export default async function MePage({
   const showTeam = ansicht === "team" && data.settings.teamCalendar;
   const b = data.balance;
 
-  const href = (m: { year: number; month: number }, view = showTeam ? "team" : undefined) =>
-    `/me?monat=${monthParam(m.year, m.month)}${view ? `&ansicht=${view}` : ""}`;
+  // The month arrows keep the current view; the tabs switch it.
+  const href = (m: { year: number; month: number }, team = showTeam) =>
+    `/me?monat=${monthParam(m.year, m.month)}${team ? "&ansicht=team" : ""}`;
   const here = { year, month };
   const arrow = "grid size-[34px] place-items-center rounded-full border border-rule bg-sheet";
   const tab = (on: boolean) =>
@@ -83,14 +84,14 @@ export default async function MePage({
           {data.settings.teamCalendar && (
             <nav className="flex border-b border-rule" aria-label="Ansicht">
               <Link
-                href={href(here, undefined)}
+                href={href(here, false)}
                 aria-current={!showTeam ? "page" : undefined}
                 className={tab(!showTeam)}
               >
                 Mein Kalender
               </Link>
               <Link
-                href={href(here, "team")}
+                href={href(here, true)}
                 aria-current={showTeam ? "page" : undefined}
                 className={tab(showTeam)}
               >

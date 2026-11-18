@@ -1,4 +1,4 @@
-import { worksOn } from "@/lib/grid";
+import { WEEKDAY_SHORT, worksOn } from "@/lib/grid";
 import type { MeData } from "@/lib/me-data";
 
 /** "Team": who from the same group is away this month, never why (R11). */
@@ -12,6 +12,21 @@ export function TeamCalendar({ data }: { data: MeData }) {
         Wer aus der Gruppe {data.profile.teamName} in diesem Monat abwesend ist. Gründe sehen nur
         Sie selbst und die Praxisleitung.
       </p>
+      {/* Dates above the day columns (R11); the rows below use the same flex columns. */}
+      <div className="flex gap-[2px] text-center leading-tight text-ink-2" aria-hidden>
+        {data.columns.map((c) => (
+          <span
+            key={c.key}
+            data-testid="team-date"
+            className={`min-w-0 flex-1 rounded-[3px] py-0.5 ${c.holiday ? "bg-[var(--holiday)]" : ""} ${c.isToday ? "font-bold text-ink outline-2 outline-[var(--marker)]" : ""}`}
+          >
+            <span className="block text-[9px]">{WEEKDAY_SHORT[c.weekday][0]}</span>
+            <span className="block text-[9.5px] tracking-[-0.08em] sm:text-[11px] sm:font-semibold sm:tracking-normal">
+              {c.day}
+            </span>
+          </span>
+        ))}
+      </div>
       <ul className="grid gap-2.5" aria-label="Ihre Gruppe">
         {data.team.map((m) => {
           const absent = new Set(m.absent);
