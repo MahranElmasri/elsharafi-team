@@ -97,6 +97,14 @@ Each task gets tests first and is ticked off when done. Each one touches at most
   - Work: the xlsx and json routes.
   - Verify: e2e download; the file opens and matches the grid
 
+- [x] **T17f Hide admins from staff lists** (Req R2, v1.13)
+  - Work: migration `20261118120000_hide_admins.sql` (`team_day_load`, `request_conflicts`, `request_over_limit`, `team_members` skip `role = 'admin'`); `lib/grid-data.ts` and `lib/export.ts` load employees only.
+  - Verify: pgTAP: an admin in the caller's team is not in `team_members()` and not counted in `team_day_load`; e2e grid and export specs pass; the Admin row is gone from the grid
+
+- [x] **T13b Team calendar dates** (Req R11, v1.14)
+  - Work: a date header row in `components/me/TeamCalendar.tsx`, same columns as the rows; "Mein Kalender" tab goes back from the team view (fix in `app/me/page.tsx`).
+  - Verify: e2e: the header shows the month's day numbers; Team → Mein Kalender leaves `ansicht=team`; fits at 375 px
+
 ## Phase D — Go-live
 - [ ] **T19 Import** (Req R22)
   - Blocked by Open Question 1.

@@ -26,6 +26,7 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 - An admin SHALL never set or see an employee's password (see R23).
 
 ### R2 Admin grid
+- Accounts with the admin role are not staff. THE SYSTEM SHALL NOT show them in the grid, the team calendar (R11), the Vertretung list, the staffing counts and conflict warnings (R10) or the Excel export (R21). They SHALL stay listed under Mitarbeitende so they can be managed.
 - THE SYSTEM SHALL show employees × Mon–Fri for the selected month, with a name search and category tabs (Arbeiter / Ärzte / Verwaltung).
 - Each row SHALL show sick / vacation-taken / remaining counts. WHEN a count is clicked, the system SHALL list those dates.
 - A yellow line SHALL mark the month start and a blue line SHALL follow each Friday. Holidays SHALL be a red column that can't be clicked, and today SHALL be highlighted.
@@ -93,6 +94,7 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 
 ### R11 Team calendar
 - An employee SHALL see their own category's absences, with colleagues shown only as **"abwesend"**.
+- Above the colleagues' rows, THE SYSTEM SHALL show each working day's weekday initial and day number, aligned with the day columns; today and holidays SHALL be marked the same way as in the rows.
 - The absence type SHALL never be sent to an employee for anyone but themselves.
 - IF the "Team calendar" switch is off (R24), THE SYSTEM SHALL return no colleague data to employees and hide the Team tab.
 

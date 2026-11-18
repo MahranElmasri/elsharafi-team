@@ -1,5 +1,5 @@
 # PRD — MVZ El-Sharafi: Anwesenheit & Urlaub
-**Version:** 1.12 · **Date:** 2026-11-17 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
+**Version:** 1.14 · **Date:** 2026-11-18 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
 
 | Document | Contents |
 |---|---|
@@ -106,4 +106,6 @@ Print view, blackout periods, a second language, approval for sick days, rotatin
 | 1.10 | 2026-11-17 | Hosting decided: Vercel at `https://plan.mvz-elsharafi.de` with the hosted Supabase project; links in emails, invites and QR codes use this domain |
 | 1.11 | 2026-11-17 | Eye icon on every password field (login, set password) to show or hide what was typed |
 | 1.12 | 2026-11-17 | Vertretung: the substitute is told when the leave is approved (not when it is requested) and when an approved leave is cancelled; a sick report can also name a substitute, who is told at once |
+| 1.13 | 2026-11-18 | Admin accounts are not staff: they no longer appear in the grid, the team calendar, the Vertretung list, staffing counts or the Excel export (still managed under Mitarbeitende) |
+| 1.14 | 2026-11-18 | Team calendar shows the date (weekday and day number) above each day column |
 
