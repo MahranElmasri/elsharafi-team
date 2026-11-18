@@ -1,5 +1,5 @@
 # PRD — MVZ El-Sharafi: Anwesenheit & Urlaub
-**Version:** 1.3 · **Date:** 2026-11-10 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
+**Version:** 1.12 · **Date:** 2026-11-17 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
 
 | Document | Contents |
 |---|---|
@@ -49,7 +49,7 @@ One online app where:
 2. The admin clicks **"Einladung erstellen"**, which makes a one-time link valid for 7 days:
    - **Employee has an email:** the link is emailed automatically. The email shows the username, the steps to set the password, a button with the link, and the same QR code, so it can be opened on the phone by scanning it from the computer screen.
    - **No email:** the screen shows the link plus a QR code to print, scan from the admin's screen, or forward on WhatsApp.
-3. The employee opens the link and sets their own password (at least 10 characters, entered twice). They are then logged in, and the link stops working.
+3. The employee opens the link and sets their own password (at least 6 characters (letters or digits, no other rules), entered twice). They are then logged in, and the link stops working.
 4. From then on they log in with **username + password**. The admin never sets or sees a password.
 5. **Forgotten password:**
    - **With an email:** a self-service "Passwort vergessen" link.
@@ -102,4 +102,8 @@ Print view, blackout periods, a second language, approval for sick days, rotatin
 | 1.6 | 2026-11-11 | App icon: a coloured calendar replaces the default Next.js favicon |
 | 1.7 | 2026-11-11 | PWA: installable app plus web push notifications (moved out of "Not doing"); offline use stays out |
 | 1.8 | 2026-11-11 | Invite email: username, step-by-step instructions, link button and QR code |
+| 1.9 | 2026-11-12 | Simpler passwords: minimum 6 characters (was 10), no complexity rules |
+| 1.10 | 2026-11-17 | Hosting decided: Vercel at `https://plan.mvz-elsharafi.de` with the hosted Supabase project; links in emails, invites and QR codes use this domain |
+| 1.11 | 2026-11-17 | Eye icon on every password field (login, set password) to show or hide what was typed |
+| 1.12 | 2026-11-17 | Vertretung: the substitute is told when the leave is approved (not when it is requested) and when an approved leave is cancelled; a sick report can also name a substitute, who is told at once |
 

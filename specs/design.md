@@ -61,8 +61,8 @@ All functions use `set search_path = public`, revoke `anon`, and run an explicit
 - **Allowance:** `suggested_allowance(user, year, fulltime_days)` · `balance_of(user, year, as_of)` (yourself or admin) and `balances(year, as_of)` (security invoker; one row per visible profile). They return `remaining` = allowance + carry-over − expired − taken, and `available` = remaining − pending. Requests are checked against `available`.
 - **Writes:**
   - `set_absence(user, day, type|null, half|null)` (admin)
-  - `report_absence(type, a, b, note)` (employee). Days that already have an entry are skipped and returned in `skipped`. Sick during vacation (§9 BUrlG: vacation days covered by an AU are credited back) is handled by the admin changing the cell from U to X.
-  - `request_leave(...)`, `decide_leave(id, approve, note)` (uses `FOR UPDATE`), `cancel_leave(id)`
+  - `report_absence(type, a, b, note, substitute?)` (employee; the substitute is checked like in `request_leave` and notified at once with "abwesend", never the type; not stored). Days that already have an entry are skipped and returned in `skipped`. Sick during vacation (§9 BUrlG: vacation days covered by an AU are credited back) is handled by the admin changing the cell from U to X.
+  - `request_leave(...)` (notifies the admins only), `decide_leave(id, approve, note)` (uses `FOR UPDATE`; on approval also notifies `substitute_id`), `cancel_leave(id)` (an admin cancelling an approved request also tells `substitute_id`). Substitute messages carry name and dates only. Migration `20261117120000_substitute_notify.sql`.
   - `set_closure(a, b, note)` and `remove_closure(a, b)` (admin; at most 31 days per closure)
   - `set_au(user, day, received)` (admin)
   - `set_note(user, day, text|null)` (admin)
@@ -71,7 +71,7 @@ All functions use `set search_path = public`, revoke `anon`, and run an explicit
   - `save_absence_type(...)` and `delete_absence_type(code)` (admin; R25)
 - **Feature switches (R24)**, enforced inside the functions:
   - `half_days` off → `request_leave`, `set_absence` and `set_absence_range` reject half-day input.
-  - `substitutes` off → `request_leave` ignores `substitute_id`, and no substitute is notified.
+  - `substitutes` off → `request_leave` and `report_absence` ignore the substitute, and no substitute is notified (also not on approval or cancellation).
   - `team_calendar` off → `team_calendar()` returns nothing for non-admins.
   - `au_tracking` off → `missing_au()` returns nothing, and `set_au` is rejected.
   - Hidden types (`visible = false`) are rejected by `request_leave`, `report_absence`, `set_absence` and `set_absence_range`.
@@ -138,6 +138,9 @@ npx supabase start       # local stack (Docker); Realtime must run for the bell 
 npx supabase test db     # pgTAP
 npx supabase db reset    # re-apply migrations + seed locally
 npx supabase db push --db-url "$SUPABASE_DB_URL"   # production — ask first
+# Production: Vercel at https://plan.mvz-elsharafi.de, Supabase project jvmehkgacwozfmuyiuyo.
+# APP_URL builds every link in emails, invites and QR codes (lib/app-url.ts). It falls back to the
+#   production domain, so local dev sets APP_URL=http://localhost:3000 in .env.local.
 node --env-file=.env.local scripts/create-admin.mjs <username> "<Name>" <password> [email]
 # Local development reads .env.local (keys from `npx supabase status -o env`), which overrides .env.
 node scripts/import-praxisplan.mjs <file> [--dry-run]
@@ -165,6 +168,8 @@ node scripts/import-praxisplan.mjs <file> [--dry-run]
 
 
 ## 11. UI design — "pencil and ink"
+- **Password fields:** `components/PasswordInput.tsx` (label, input, eye button). The button is `type="button"`, a toggle with the fixed name "Anzeigen" (`aria-pressed` carries the state, so `getByLabel("Passwort")` still finds only the input) and the tooltip "Passwort anzeigen"/"Passwort verbergen"; the icons are inline SVG, no icon package.
+
 **The idea:** a paper duty roster is pencilled in first and inked once it's confirmed. The app does the same:
 - **Pending entries** are pencil: Bleistift grey, a dashed outline, the letter in grey.
 - **Approved entries** are ink: a solid round stamp in the type's colour.

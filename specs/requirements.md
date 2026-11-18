@@ -71,12 +71,15 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 ### R7 Requests
 - An employee SHALL be able to request any visible type marked "request" for a date range, with half-day start/end and an optional substitute from the same category.
 - IF the "Substitute" switch is off (R24), the substitute field SHALL be hidden and not saved.
+- WHEN an admin approves a request with a substitute, THE SYSTEM SHALL notify the substitute (in-app and email) with the name and dates only, never the type or note. The substitute SHALL NOT be notified when the request is made, denied or withdrawn while pending.
+- WHEN an admin cancels an approved request with a substitute, THE SYSTEM SHALL tell the substitute that the absence is off.
 - IF a vacation request exceeds the available balance, THE SYSTEM SHALL reject it.
 - IF any day already has an entry, THE SYSTEM SHALL reject the request and name the day.
 - Accepted requests SHALL appear as pending.
 
 ### R8 Sick self-report
 - WHEN an employee reports X or K for a range, THE SYSTEM SHALL record it as approved straight away and notify the admins.
+- The report SHALL accept an optional substitute from the same team (R7 rules and switch). WHEN one is chosen, THE SYSTEM SHALL notify them at once with the name and dates only; the words "krank" or the type SHALL NOT appear.
 
 ### R9 Approval
 - An admin SHALL be able to approve or deny a pending request, or cancel an approved one, with an optional note.
@@ -119,7 +122,9 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 
 ### R18 Notifications
 - A live in-app bell plus SMTP email, for:
-  - a new request (to admins and the substitute)
+  - a new request (to admins)
+  - an approved request, or the cancellation of an approved one (to the substitute; R7)
+  - a sick report (to the substitute, if one is chosen; R8)
   - a sick report (to admins)
   - a decision or cancellation (to the other party)
   - reminders (to employees)
@@ -148,8 +153,9 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 ### R23 Invite & password reset
 - WHEN an admin clicks "Einladung erstellen", THE SYSTEM SHALL create a single-use link valid for 7 days. Any older unused link for that person SHALL stop working.
 - IF the person has an email, THE SYSTEM SHALL email the link. In every case it SHALL show the link plus a QR code to print, scan or share.
-- The invite email SHALL contain the person's username, the steps to set the password (open the link or scan the QR code, enter a password of at least 10 characters twice, save, then log in with username and password), the link, the QR code of the link, and when the link expires. It SHALL also be readable as plain text.
-- WHEN the link is opened, THE SYSTEM SHALL ask for a new password (at least 10 characters, entered twice), save it, sign the person in, and mark the link used.
+- The invite email SHALL contain the person's username, the steps to set the password (open the link or scan the QR code, enter a password of at least 6 characters (letters or digits, no other rules) twice, save, then log in with username and password), the link, the QR code of the link, and when the link expires. It SHALL also be readable as plain text.
+- WHEN the link is opened, THE SYSTEM SHALL ask for a new password (at least 6 characters (letters or digits, no other rules), entered twice), save it, sign the person in, and mark the link used.
+- Every password field (login, set password) SHALL have an eye button. WHEN it is clicked, THE SYSTEM SHALL show the typed password as text; a second click SHALL hide it again. The button SHALL be keyboard-reachable and announce its state.
 - IF the link is used, expired, or belongs to a deactivated account, THE SYSTEM SHALL refuse it with a German message.
 - WHEN someone clicks "Passwort vergessen" and enters a username, THE SYSTEM SHALL always answer the same way, so nobody can find out which usernames exist. If that account has an email, the system SHALL email a new link, at most 1 per 15 minutes. Without an email, the page says "bitte an die Praxisleitung wenden".
 
@@ -205,7 +211,7 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 ## 5. Open questions
 1. **Old data file:** the PraxisPlan "Herunterladen" and/or Excel file, placed in the repo. Blocks R22 / T19.
 2. **`.env` values:** `SUPABASE_DB_URL`, `SMTP_HOST/PORT/USER/PASS`, `MAIL_FROM`, `APP_URL`, `CRON_SECRET`.
-3. **Hosting:** Vercel is the default assumption.
+3. **Hosting:** decided (v1.10): Vercel at `https://plan.mvz-elsharafi.de`, hosted Supabase project `jvmehkgacwozfmuyiuyo`.
 4. **Supabase project:** confirm the EU region and the signed DPA (AVV).
 5. **Docker:** installed but not running. It's needed for the local Supabase stack, pgTAP and e2e tests.
 6. **Employee details:** working weekdays and contract allowance for each employee.
@@ -218,4 +224,5 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 - **v1.4 (2026-11-11):** R25 changed: a one-click "Sichtbar" switch on each non-fixed type's row.
 - **v1.5 (2026-11-11):** R27 Mobile app (PWA) and push notifications added.
 - **v1.6 (2026-11-11):** R23: the invite email shows the username, the steps, and the QR code.
-
+- **v1.7 (2026-11-17):** R23: an eye button on each password field shows or hides the password.
+- **v1.8 (2026-11-17):** R7, R8, R18: the substitute is notified on approval (not on request) and on cancellation of an approved request; a sick report can name a substitute.

@@ -48,6 +48,9 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T10b Invite email with steps and QR** (Req R23)
   - Work: `inviteMail()` in `lib/invites.ts` (text + HTML, inline QR PNG); `Mail` gets `html`/`attachments`; `createInviteFor` uses it.
   - Verify: Vitest: username, steps, link, expiry and the QR attachment are in the mail, and names are escaped; one real send to an own address.
+- [x] **T10c Shorter passwords** (Req R23)
+  - Work: minimum 6 characters (was 10) in `SetPasswordForm`, `app/actions/invites.ts`, `lib/labels.ts`, `scripts/create-admin.mjs`; Supabase `minimum_password_length = 6`, no `password_requirements`.
+  - Verify: typecheck, Vitest and Prettier pass.
 - [x] **T11 Grid view** (Req R2)
   - Work: `AttendanceGrid` (read only): month, search, tabs, counts, lines, holidays, today, hatching.
   - Verify: Vitest for the column builder; manual check with 45 rows
@@ -75,12 +78,18 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T15c PWA & push** (Req R27)
   - Work: migration (`push_subscriptions`, save/delete RPCs, `call_app_endpoint`, notifications trigger); `app/manifest.ts`, `app/apple-icon.png`, 192 px icon; `public/sw.js`; `PushToggle` in the Meldungen panel; `lib/push.ts` + `app/api/push`; middleware paths; `web-push@3.6.7`; local VAPID keys in `.env.local` and local Vault `app_url` = `http://host.docker.internal:3000`; logout first removes this device's push.
   - Verify: pgTAP: RLS and RPCs, the trigger queues one request only when a recipient has a subscription and Vault is set; Vitest: payload and 404/410 cleanup; e2e: manifest served, `sw.js` registered, toggle shown; the real phone check (needs HTTPS) moves to T20
+- [x] **T17e Show password** (Req R23, v1.11)
+  - Work: `components/PasswordInput.tsx`; used in `LoginForm` and `SetPasswordForm`.
+  - Verify: typecheck, lint; e2e: the eye button switches the login field between `password` and `text`; existing login and invite specs pass
 - [x] **T17d App icon**
   - Work: `app/favicon.ico` and `app/icon.png` from the calendar artwork.
   - Verify: the tab shows the calendar; `/favicon.ico` and the icon link load
 - [x] **T17c Type show/hide switch** (Req R25)
   - Work: shared `Switch` component; `setTypeVisible` action; a switch on each non-fixed row of Abwesenheitsarten; the form keeps "Sichtbar" for new types only.
   - Verify: e2e: switching off Sonderurlaub Umzug removes it from the grid menu and the request form; switching on brings it back; fixed types have no switch
+- [x] **T15d Substitute notices** (Req R7, R8, R18, v1.12)
+  - Work: migration `20261117120000_substitute_notify.sql` (`request_leave` without the substitute notice; `decide_leave` and `cancel_leave` notify the substitute; `report_absence` gets `p_substitute`); `reportSick` passes it; "Vertretung (freiwillig)" in the Krank melden form.
+  - Verify: pgTAP: no substitute notice on request; one on approval, none on denial; one on cancelling an approved request; sick report with substitute notifies without the type; a substitute from another team is refused; switch off → nobody notified. e2e request/sick specs pass
 - [x] **T15b Live page update** (Req R18)
   - Work: the bell calls `router.refresh()` on each Realtime INSERT.
   - Verify: e2e: a request shows in the admin's open grid and "Offene Anträge" with no reload; an approval shows on the employee's open `/me` with no reload
@@ -93,6 +102,9 @@ Each task gets tests first and is ticked off when done. Each one touches at most
   - Blocked by Open Question 1.
   - Work: the parser and script.
   - Verify: Vitest for the parser; `--dry-run` totals match
+- [ ] **T20a Production URL & database** (v1.10)
+  - Work: one `appUrl()` in `lib/app-url.ts` with the fallback `https://plan.mvz-elsharafi.de` (invites, notification and reminder emails); `db push` of all migrations to project `jvmehkgacwozfmuyiuyo`; Vercel env vars; Supabase Auth Site URL; Vault `app_url` = `https://plan.mvz-elsharafi.de`.
+  - Verify: typecheck, unit tests; remote migration list matches `supabase/migrations`; login works on `https://plan.mvz-elsharafi.de`
 - [ ] **T20 Release** (ask first)
   - Work: `db push` to production, deploy, set the Vault secrets `app_url` and `cron_secret`, the VAPID keys (`npx web-push generate-vapid-keys`) and `VAPID_SUBJECT`, create the admin, real import, full e2e against staging, and a real Android and iPhone (added to the home screen) get a push with the app closed (R27).
   - Verify: every success criterion in `requirements.md` §3
