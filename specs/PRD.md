@@ -1,5 +1,5 @@
 # PRD — MVZ El-Sharafi: Anwesenheit & Urlaub
-**Version:** 1.14 · **Date:** 2026-11-18 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
+**Version:** 1.15 · **Date:** 2026-11-18 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
 
 | Document | Contents |
 |---|---|
@@ -42,7 +42,7 @@ One online app where:
 | Mobile app (PWA) | Installable on the phone's home screen (opens full screen); push notifications on the phone, also when the app is closed, after opting in per device | R27 |
 | Privacy | Audit log, 3-year deletion of health data, sick details visible to admins only | R20 |
 | Data | Excel export, JSON backup, one-time import of 2026 from PraxisPlan | R21, R22 |
-| Settings | Admin page "Einstellungen" with on/off switches for team calendar, half days, substitute, AU tracking | R24 |
+| Settings | Admin page "Einstellungen" with on/off switches for team calendar, half days, substitute, AU tracking, and email recipients (e.g. the reception) told who is absent | R24, R18 |
 
 ## 4a. First login & forgotten password
 1. The admin creates the employee (name, username, optional email, team, …).
@@ -108,4 +108,5 @@ Print view, blackout periods, a second language, approval for sick days, rotatin
 | 1.12 | 2026-11-17 | Vertretung: the substitute is told when the leave is approved (not when it is requested) and when an approved leave is cancelled; a sick report can also name a substitute, who is told at once |
 | 1.13 | 2026-11-18 | Admin accounts are not staff: they no longer appear in the grid, the team calendar, the Vertretung list, staffing counts or the Excel export (still managed under Mitarbeitende) |
 | 1.14 | 2026-11-18 | Team calendar shows the date (weekday and day number) above each day column |
+| 1.15 | 2026-11-18 | Einstellungen: email recipients for the reception, told who is not in the practice (name and dates only, no reason, no app link): at once for a sick report, for leave once the admin approves it, and when an approved leave is cancelled |
 

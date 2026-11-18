@@ -105,6 +105,10 @@ Each task gets tests first and is ticked off when done. Each one touches at most
   - Work: a date header row in `components/me/TeamCalendar.tsx`, same columns as the rows; "Mein Kalender" tab goes back from the team view (fix in `app/me/page.tsx`).
   - Verify: e2e: the header shows the month's day numbers; Team → Mein Kalender leaves `ansicht=team`; fits at 375 px
 
+- [x] **T17g Reception emails** (Req R18, v1.15)
+  - Work: migration `20261118130000_notify_recipients.sql` (table, RLS, audit, `reception_notice`; `report_absence`, `decide_leave`, `cancel_leave` call it); actions `addRecipient`/`removeRecipient` in `app/actions/settings.ts`; section "E-Mail-Empfänger" on Einstellungen; audit and backup know the table; `appUrl()` keeps only the origin.
+  - Verify: pgTAP: employees can't read or add; sick report → at once, name and dates only, no link; request, withdrawal, denial → nothing; approval → told; cancelling an approved leave → "doch in der Praxis"; invalid address refused. Vitest: `appUrl()` drops a path. e2e: add an address, see it listed, remove it
+
 ## Phase D — Go-live
 - [ ] **T19 Import** (Req R22)
   - Blocked by Open Question 1.

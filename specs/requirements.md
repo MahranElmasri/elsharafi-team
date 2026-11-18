@@ -130,6 +130,12 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
   - a sick report (to admins)
   - a decision or cancellation (to the other party)
   - reminders (to employees)
+- Reception emails: on Einstellungen, an admin SHALL be able to add and remove email addresses (e.g. the reception). THE SYSTEM SHALL email each address "{Name} ist {am Tag | vom … bis …} nicht in der Praxis.":
+  - WHEN an employee reports sick, at once;
+  - WHEN an admin approves a request (vacation or any other type), not before;
+  - and "{Name} ist … doch in der Praxis." WHEN an admin cancels an approved leave.
+  - New requests, withdrawn pending requests and denials SHALL NOT be sent. The email SHALL carry the name and dates only: never the type, the reason or a note, and no link to the app. It is email only, with no in-app notice.
+  - IF an address is not a valid email, THE SYSTEM SHALL refuse it with a message. Only admins SHALL be able to read or change the list, and changes SHALL be audit-logged.
 - IF a person has no email address, the email is skipped. IF an email fails, it SHALL be logged and the action SHALL still succeed.
 - WHEN an in-app notification arrives, THE SYSTEM SHALL reload the data of the page the person has open, without a full page reload: the admin grid and "Offene Anträge" count show a new request or sick report, and the employee's calendar and request list show a decision or cancellation.
 - The reload SHALL keep open dialogs, typed input and the scroll position.
