@@ -171,19 +171,7 @@ function RequestFields({ data, today }: { data: MeData; today: string }) {
           </label>
         </div>
       )}
-      {data.settings.substitutes && data.team.length > 0 && (
-        <label className={label}>
-          Vertretung (freiwillig)
-          <select name="substitute" className="field" defaultValue="">
-            <option value="">Keine</option>
-            {data.team.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
+      <SubstituteField data={data} />
       <label className={label}>
         Notiz an die Praxisleitung (freiwillig)
         <textarea name="note" rows={2} maxLength={500} className="field" />
@@ -192,6 +180,24 @@ function RequestFields({ data, today }: { data: MeData; today: string }) {
         Gezählt werden nur Ihre Arbeitstage. Feiertage zählen nicht.
       </p>
     </>
+  );
+}
+
+/** Optional colleague from the same group (R7, R8); told on approval, or at once for a sick report. */
+function SubstituteField({ data }: { data: MeData }) {
+  if (!data.settings.substitutes || data.team.length === 0) return null;
+  return (
+    <label className={label}>
+      Vertretung (freiwillig)
+      <select name="substitute" className="field" defaultValue="">
+        <option value="">Keine</option>
+        {data.team.map((m) => (
+          <option key={m.id} value={m.id}>
+            {m.name}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 
@@ -214,6 +220,7 @@ function SickFields({ data, today }: { data: MeData; today: string }) {
         ))}
       </fieldset>
       <DateFields today={today} toLabel="Bis voraussichtlich" />
+      <SubstituteField data={data} />
       <label className={label}>
         Notiz an die Praxisleitung (freiwillig)
         <textarea name="note" rows={2} maxLength={500} className="field" />

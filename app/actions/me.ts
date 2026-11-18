@@ -63,6 +63,7 @@ export async function reportSick(_prev: MeActionState, form: FormData): Promise<
   if (!range) return { error: "Wählen Sie den ersten Tag und den voraussichtlich letzten Tag." };
   const text = note(form);
   if (text === null) return { error: "Die Notiz darf höchstens 500 Zeichen haben." };
+  const substitute = String(form.get("substitute") ?? "");
 
   const supabase = await createServerClient();
   const { data, error } = await supabase.rpc("report_absence", {
@@ -70,6 +71,7 @@ export async function reportSick(_prev: MeActionState, form: FormData): Promise<
     p_from: range.from,
     p_to: range.to,
     p_note: text || null,
+    p_substitute: UUID.test(substitute) ? substitute : null,
   });
   if (error) return { error: error.message };
   await sendAll(data.emails);
