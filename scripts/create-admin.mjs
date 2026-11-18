@@ -25,7 +25,7 @@ if (!/^[a-z0-9][a-z0-9._-]{2,31}$/.test(username)) {
     "Benutzername: 3–32 Zeichen, Kleinbuchstaben, Ziffern, Punkt, Bindestrich oder Unterstrich.",
   );
 }
-if (password.length < 10) fail("Das Passwort muss mindestens 10 Zeichen haben.");
+if (password.length < 6) fail("Das Passwort muss mindestens 6 Zeichen haben.");
 
 const supabase = createClient(url, key, {
   auth: { autoRefreshToken: false, persistSession: false },

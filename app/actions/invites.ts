@@ -23,7 +23,7 @@ export async function setPassword(
 ): Promise<FormState> {
   const password = String(form.get("password") ?? "");
   const repeat = String(form.get("repeat") ?? "");
-  if (password.length < 10) return { error: labels.invite.tooShort };
+  if (password.length < 6) return { error: labels.invite.tooShort };
   if (password !== repeat) return { error: labels.invite.mismatch };
 
   const admin = createAdminClient();

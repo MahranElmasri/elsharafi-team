@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { login, type LoginState } from "@/app/actions/auth";
 import { labels } from "@/lib/labels";
+import { PasswordInput } from "@/components/PasswordInput";
 
 export function LoginForm({ notice }: { notice?: string }) {
   const [state, action, pending] = useActionState<LoginState, FormData>(login, {});
@@ -21,16 +22,11 @@ export function LoginForm({ notice }: { notice?: string }) {
           className="field"
         />
       </label>
-      <label className="grid gap-1.5">
-        <span className="text-sm font-bold">{labels.login.password}</span>
-        <input
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          required
-          className="field"
-        />
-      </label>
+      <PasswordInput
+        label={labels.login.password}
+        name="password"
+        autoComplete="current-password"
+      />
       {message && (
         <p role="alert" className="border-l-4 border-krank pl-3 text-sm text-krank">
           {message}

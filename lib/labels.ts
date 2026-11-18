@@ -2,6 +2,7 @@
 export const labels = {
   appName: "Anwesenheit",
   practice: "MVZ El-Sharafi",
+  showPassword: { name: "Anzeigen", show: "Passwort anzeigen", hide: "Passwort verbergen" },
   login: {
     title: "Anmelden",
     username: "Benutzername",
@@ -18,12 +19,12 @@ export const labels = {
     titleInvite: "Passwort festlegen",
     titleReset: "Neues Passwort festlegen",
     greeting: (name: string) =>
-      `Guten Tag, ${name}. Legen Sie ein Passwort mit mindestens 10 Zeichen fest.`,
+      `Guten Tag, ${name}. Legen Sie ein Passwort mit mindestens 6 Zeichen fest.`,
     password: "Neues Passwort",
     repeat: "Passwort wiederholen",
     submit: "Passwort speichern",
     pending: "Speichern …",
-    tooShort: "Das Passwort braucht mindestens 10 Zeichen.",
+    tooShort: "Das Passwort braucht mindestens 6 Zeichen.",
     mismatch: "Die beiden Passwörter sind nicht gleich. Geben Sie es zweimal gleich ein.",
     failed: "Das Passwort konnte nicht gespeichert werden. Bitte versuchen Sie es noch einmal.",
     unknown: "Dieser Link ist ungültig. Prüfen Sie, ob Sie ihn vollständig geöffnet haben.",
@@ -105,7 +106,7 @@ export const labels = {
       stepsTitle: "So legen Sie Ihr Passwort fest:",
       steps: (loginUrl: string) => [
         "Öffnen Sie den Link unten oder scannen Sie den QR-Code mit der Kamera Ihres Handys.",
-        "Geben Sie ein neues Passwort mit mindestens 10 Zeichen ein, zweimal gleich.",
+        "Geben Sie ein neues Passwort mit mindestens 6 Zeichen ein, zweimal gleich.",
         "Klicken Sie auf „Passwort speichern“. Sie sind dann angemeldet.",
         `Künftig melden Sie sich unter ${loginUrl} mit Ihrem Benutzernamen und diesem Passwort an.`,
       ],

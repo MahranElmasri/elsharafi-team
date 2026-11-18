@@ -25,6 +25,19 @@ async function logIn(page: Page, username: string, password: string) {
 // Next.js adds its own empty role="alert" route announcer outside <main>.
 const alertIn = (page: Page) => page.locator("main").getByRole("alert");
 
+test("the eye button shows and hides the password", async ({ page }) => {
+  await page.goto("/login");
+  const field = page.getByLabel("Passwort");
+  const eye = page.getByRole("button", { name: "Anzeigen" });
+  await field.fill("geheim1");
+  await expect(field).toHaveAttribute("type", "password");
+  await eye.click();
+  await expect(field).toHaveAttribute("type", "text");
+  await expect(eye).toHaveAttribute("aria-pressed", "true");
+  await eye.click();
+  await expect(field).toHaveAttribute("type", "password");
+});
+
 test("public sign-up is refused", async () => {
   const anon = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
