@@ -15,6 +15,7 @@ export async function loadGridData(year: number, month: number): Promise<GridDat
       supabase
         .from("profiles")
         .select("id, full_name, team_id, active, workdays, start_date, end_date, sort")
+        .eq("role", "employee") // admins are not staff (R2)
         .lte("start_date", to)
         .order("sort")
         .order("full_name"),

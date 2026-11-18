@@ -1,6 +1,6 @@
 -- T6 Conflicts, staffing load, team calendar (R10, R11)
 begin;
-select plan(11);
+select plan(13);
 -- The switches can be changed in the app; the tests assume all on (rolled back at the end).
 update public.app_settings set team_calendar = true, half_days = true, substitutes = true, au_tracking = true;
 
@@ -18,13 +18,17 @@ insert into auth.users (id, email, raw_user_meta_data, raw_app_meta_data) values
   ('00000000-0000-0000-0000-0000000000e4', 'kai@example.org',
    '{"username":"kai","full_name":"Kai","team":"arbeiter","start_date":"2020-01-01"}', '{}'),
   ('00000000-0000-0000-0000-0000000000e5', 'dora@example.org',
-   '{"username":"dora","full_name":"Dr. Dora","team":"aerzte","start_date":"2020-01-01"}', '{}');
+   '{"username":"dora","full_name":"Dr. Dora","team":"aerzte","start_date":"2020-01-01"}', '{}'),
+  -- An admin placed in the Arbeiter team: not staff, so never listed or counted (R2).
+  ('00000000-0000-0000-0000-0000000000e6', 'chef@example.org',
+   '{"username":"chef","full_name":"Chef","team":"arbeiter","start_date":"2020-01-01"}', '{"role":"admin"}');
 insert into leave_allowances values ('00000000-0000-0000-0000-0000000000e2', 2026, 30, 0);
 insert into absence_days (user_id, day, type) values
   ('00000000-0000-0000-0000-0000000000e3', '2026-11-24', 'vacation'),
   ('00000000-0000-0000-0000-0000000000e3', '2026-11-25', 'vacation'),
   ('00000000-0000-0000-0000-0000000000e4', '2026-11-25', 'sick'),
-  ('00000000-0000-0000-0000-0000000000e5', '2026-11-25', 'sick');
+  ('00000000-0000-0000-0000-0000000000e5', '2026-11-25', 'sick'),
+  ('00000000-0000-0000-0000-0000000000e6', '2026-11-25', 'vacation');
 
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000e2","role":"authenticated"}', true);
@@ -42,6 +46,8 @@ select is((select count(*)::int from team_calendar('2026-11-01', '2026-11-30') w
 select is((select count(*)::int from team_calendar('2026-11-01', '2026-11-30') where full_name = 'Dr. Dora'), 0,
   'other teams are not shown');
 select is((select count(*)::int from team_members()), 2, 'team members are the other people in Lena''s team');
+select is((select count(*)::int from team_calendar('2026-11-01', '2026-11-30') where full_name = 'Chef'), 0,
+  'an admin in the same team is not in the team calendar');
 select throws_ok($$select * from request_conflicts()$$, '42501', 'Das darf nur die Praxisleitung.',
   'employees cannot read conflicts');
 
@@ -62,6 +68,8 @@ select results_eq($$select day, absent_count, max_absent from request_over_limit
 select is((select absent_count from team_day_load('2026-11-25', '2026-11-25') where team_id = 'aerzte'), 1,
   'the daily load counts per team');
 select is((select count(*)::int from team_day_load('2026-11-28', '2026-11-29')), 0, 'weekends are not counted');
+select is((select absent_count from team_day_load('2026-11-25', '2026-11-25') where team_id = 'arbeiter'), 3,
+  'an absent admin is not counted in the staffing load');
 
 select * from finish();
 rollback;

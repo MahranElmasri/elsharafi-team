@@ -51,6 +51,7 @@ export async function loadExport(year: number, asOf: string): Promise<ExportData
     supabase
       .from("profiles")
       .select("id, full_name, team_id, workdays, start_date, end_date, sort")
+      .eq("role", "employee") // admins are not staff (R2)
       .lte("start_date", to)
       .or(`end_date.is.null,end_date.gte.${from}`)
       .order("sort")
