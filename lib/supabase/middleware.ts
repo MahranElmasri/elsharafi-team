@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { SESSION_ONLY_COOKIE, sessionCookie } from "./session-cookie";
 
 const PUBLIC_PATHS = ["/login", "/einladung", "/passwort-vergessen", "/api/cron", "/api/push"];
 
@@ -10,6 +11,7 @@ export function isPublicPath(path: string) {
 /** Refreshes the session cookie and sends signed-out visitors to /login. */
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
+  const sessionOnly = request.cookies.has(SESSION_ONLY_COOKIE);
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -19,7 +21,9 @@ export async function updateSession(request: NextRequest) {
         setAll: (list) => {
           list.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });
-          list.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+          list.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, sessionCookie(value, options, sessionOnly)),
+          );
         },
       },
     },

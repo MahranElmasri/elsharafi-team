@@ -75,6 +75,31 @@ test("an employee lands on /me and cannot open /admin", async ({ page }) => {
   await expect(page).toHaveURL(/\/me$/);
 });
 
+test("Angemeldet bleiben decides whether the session outlives the browser", async ({ page }) => {
+  const authCookies = async () =>
+    (await page.context().cookies()).filter((c) => c.name.startsWith("sb-"));
+
+  await page.goto("/login");
+  await expect(page.getByLabel("Angemeldet bleiben")).toBeChecked();
+  await page.getByLabel("Angemeldet bleiben").uncheck();
+  await page.getByLabel("Benutzername").fill(staff.username);
+  await page.getByLabel("Passwort").fill(staff.password);
+  await page.getByRole("button", { name: "Anmelden" }).click();
+  await expect(page).toHaveURL(/\/me$/);
+  const sessionOnly = await authCookies();
+  expect(sessionOnly.length).toBeGreaterThan(0);
+  for (const c of sessionOnly) expect(c.expires).toBe(-1); // ends with the browser
+
+  await page.context().clearCookies();
+  await logIn(page, staff.username, staff.password);
+  await expect(page).toHaveURL(/\/me$/);
+  const kept = await authCookies();
+  expect(kept.length).toBeGreaterThan(0);
+  for (const c of kept) expect(c.expires).toBeGreaterThan(Date.now() / 1000 + 86400);
+  const marker = (await page.context().cookies()).find((c) => c.name === "nur-sitzung");
+  expect(marker).toBeUndefined();
+});
+
 test("a wrong password and an unknown username give the same answer", async ({ page }) => {
   const message = "Benutzername oder Passwort stimmt nicht. Prüfen Sie beide Angaben.";
   await logIn(page, staff.username, "falsches-passwort");

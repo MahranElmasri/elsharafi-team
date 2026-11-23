@@ -27,6 +27,10 @@ export function LoginForm({ notice }: { notice?: string }) {
         name="password"
         autoComplete="current-password"
       />
+      <label className="flex items-center gap-2 text-sm">
+        <input type="checkbox" name="remember" defaultChecked />
+        {labels.login.remember}
+      </label>
       {message && (
         <p role="alert" className="border-l-4 border-krank pl-3 text-sm text-krank">
           {message}

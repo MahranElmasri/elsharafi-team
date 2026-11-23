@@ -1,10 +1,12 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { labels } from "@/lib/labels";
 import { homeFor, type Role } from "@/lib/session";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createServerClient } from "@/lib/supabase/server";
+import { SESSION_ONLY_COOKIE } from "@/lib/supabase/session-cookie";
 
 export interface LoginState {
   error?: string;
@@ -33,9 +35,23 @@ export async function login(_prev: LoginState, form: FormData): Promise<LoginSta
   const email = account?.user?.email;
   if (!email) return { error: labels.login.failed };
 
-  const supabase = await createServerClient();
+  // "Angemeldet bleiben" unchecked: the auth cookies end with the browser (R1).
+  const sessionOnly = form.get("remember") !== "on";
+  const supabase = await createServerClient(sessionOnly);
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: labels.login.failed };
+
+  const cookieStore = await cookies();
+  if (sessionOnly) {
+    cookieStore.set(SESSION_ONLY_COOKIE, "1", {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+  } else {
+    cookieStore.delete(SESSION_ONLY_COOKIE);
+  }
 
   redirect(homeFor(profile.role as Role));
 }

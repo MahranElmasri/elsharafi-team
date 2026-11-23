@@ -7,6 +7,7 @@ export const labels = {
     title: "Anmelden",
     username: "Benutzername",
     password: "Passwort",
+    remember: "Angemeldet bleiben",
     submit: "Anmelden",
     pending: "Anmelden …",
     failed: "Benutzername oder Passwort stimmt nicht. Prüfen Sie beide Angaben.",
