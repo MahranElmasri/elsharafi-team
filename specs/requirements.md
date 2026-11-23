@@ -23,6 +23,8 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 ### R1 Login
 - WHEN a user enters a valid username and password, THE SYSTEM SHALL sign them in and send admins to `/admin` and employees to `/me`.
 - IF the account is deactivated, THE SYSTEM SHALL refuse the login and end any session that is still open.
+- The login form SHALL mark its fields as username and current password, so the browser's password manager can save and fill them.
+- The login form SHALL have an "Angemeldet bleiben" box, checked by default. WHEN it is checked, THE SYSTEM SHALL keep the user signed in until they log out. WHEN it is unchecked, THE SYSTEM SHALL keep the session only until the browser is closed.
 - An admin SHALL never set or see an employee's password (see R23).
 
 ### R2 Admin grid
@@ -234,3 +236,4 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 - **v1.6 (2026-11-11):** R23: the invite email shows the username, the steps, and the QR code.
 - **v1.7 (2026-11-17):** R23: an eye button on each password field shows or hides the password.
 - **v1.8 (2026-11-17):** R7, R8, R18: the substitute is notified on approval (not on request) and on cancellation of an approved request; a sick report can name a substitute.
+- **v1.9 (2026-11-23):** R1: "Angemeldet bleiben" box; the browser can save the login.

@@ -24,6 +24,7 @@ notifications INSERT ─► trigger ─► pg_net ─► POST {APP_URL}/api/push
 - **Login:**
   - The Auth email is the person's real email when they have one, otherwise `<username>@users.mvz-elsharafi.invalid`.
   - Login always takes the username. A server action looks up the Auth email with the service role and returns one generic error for any failure.
+  - "Angemeldet bleiben" (R1): unchecked, the login action sets the browser-session cookie `nur-sitzung=1`; checked, it deletes it. While `nur-sitzung` is present, the server client and the middleware write the Supabase auth cookies without `maxAge`/`expires` (`sessionCookie()` in `lib/supabase/session-cookie.ts`), so they end when the browser closes. Deleting cookies (empty value) keeps its `maxAge: 0`.
   - Changing someone's email also updates their Auth email (`auth.admin.updateUserById`).
 - **Invites & reset (R23):**
   - The token is 32 random bytes in base64url. Only its sha256 hash is stored in `invite_tokens`.

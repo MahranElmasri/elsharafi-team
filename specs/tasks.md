@@ -109,6 +109,10 @@ Each task gets tests first and is ticked off when done. Each one touches at most
   - Work: migration `20261118130000_notify_recipients.sql` (table, RLS, audit, `reception_notice`; `report_absence`, `decide_leave`, `cancel_leave` call it); actions `addRecipient`/`removeRecipient` in `app/actions/settings.ts`; section "E-Mail-Empfänger" on Einstellungen; audit and backup know the table; `appUrl()` keeps only the origin.
   - Verify: pgTAP: employees can't read or add; sick report → at once, name and dates only, no link; request, withdrawal, denial → nothing; approval → told; cancelling an approved leave → "doch in der Praxis"; invalid address refused. Vitest: `appUrl()` drops a path. e2e: add an address, see it listed, remove it
 
+- [x] **T17h Angemeldet bleiben** (Req R1, v1.16)
+  - Work: `lib/supabase/session-cookie.ts` (`sessionCookie()`, cookie name); `createServerClient` and `updateSession` use it; `login` sets or deletes `nur-sitzung`; checkbox in `LoginForm`, label in `lib/labels.ts`.
+  - Verify: Vitest: `sessionCookie()` drops `maxAge`/`expires` only for a session-only login and never for a deletion. e2e: unchecked login gives auth cookies with no expiry; checked login gives a persistent one; existing auth specs pass
+
 ## Phase D — Go-live
 - [ ] **T19 Import** (Req R22)
   - Blocked by Open Question 1.

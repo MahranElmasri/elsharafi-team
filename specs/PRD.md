@@ -1,5 +1,5 @@
 # PRD — MVZ El-Sharafi: Anwesenheit & Urlaub
-**Version:** 1.15 · **Date:** 2026-11-18 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
+**Version:** 1.16 · **Date:** 2026-11-23 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
 
 | Document | Contents |
 |---|---|
@@ -31,7 +31,7 @@ One online app where:
 ## 4. Scope — features
 | Area | Features | Req |
 |---|---|---|
-| Access | Username login, invite link (email or QR) to set your own password, Passwort vergessen, activate/deactivate | R1, R19, R23 |
+| Access | Username login with "Angemeldet bleiben" (stay signed in, or sign out when the browser closes on shared PCs) and a login the browser can save, invite link (email or QR) to set your own password, Passwort vergessen, activate/deactivate | R1, R19, R23 |
 | Admin grid | The familiar month grid: click cycle X → U → empty, right-click menu, notes, counts with drill-down, holiday/today/month/week markers | R2 |
 | Absence types | Admin-managed list (add, rename, letter/colour, show/hide). Starts with Urlaub, Betriebsurlaub, Krank, Kind krank, Fortbildung, Bildungsurlaub, Sonderurlaub (Hochzeit, Geburt, Todesfall, Umzug, sonstige), Überstundenabbau, Unbezahlter Urlaub, Elternzeit, Mutterschutz. Optional limits per type; a one-click Sichtbar switch per type (e.g. each Sonderurlaub); half days; admin range entry for long periods. | R3, R4, R25, R26 |
 | Correct counting | Part-time weekdays, Berlin holidays, closure days | R5, R6, R16 |
@@ -109,4 +109,5 @@ Print view, blackout periods, a second language, approval for sick days, rotatin
 | 1.13 | 2026-11-18 | Admin accounts are not staff: they no longer appear in the grid, the team calendar, the Vertretung list, staffing counts or the Excel export (still managed under Mitarbeitende) |
 | 1.14 | 2026-11-18 | Team calendar shows the date (weekday and day number) above each day column |
 | 1.15 | 2026-11-18 | Einstellungen: email recipients for the reception, told who is not in the practice (name and dates only, no reason, no app link): at once for a sick report, for leave once the admin approves it, and when an approved leave is cancelled |
+| 1.16 | 2026-11-23 | Login: "Angemeldet bleiben" box (on by default). Off, the session ends when the browser closes, for shared PCs such as the reception. The browser's password manager can save and fill username and password |
 
