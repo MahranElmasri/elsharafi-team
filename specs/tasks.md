@@ -119,6 +119,10 @@ Each task gets tests first and is ticked off when done. Each one touches at most
   - Work: `lib/supabase/session-cookie.ts` (`sessionCookie()`, cookie name); `createServerClient` and `updateSession` use it; `login` sets or deletes `nur-sitzung`; checkbox in `LoginForm`, label in `lib/labels.ts`.
   - Verify: Vitest: `sessionCookie()` drops `maxAge`/`expires` only for a session-only login and never for a deletion. e2e: unchecked login gives auth cookies with no expiry; checked login gives a persistent one; existing auth specs pass
 
+- [x] **T17i Reception emails for overview entries** (Req R18, v1.19)
+  - Work: migration `20261124120000_reception_grid.sql`: `set_absence` (now returns jsonb `{day, emails}`), `set_absence_range` (adds `emails`) and `clear_absence_range` (now returns jsonb `{removed, emails}`) call `reception_notice` for the days actually added or removed; `setCell` and `saveRange` send the emails; the "E-Mail-Empfänger" text on Einstellungen names the overview; pgTAP `03_absences` and `08_types_ranges` adjusted to the jsonb returns.
+  - Verify: pgTAP: a new grid day → "nicht in der Praxis" for that day; a type change → nothing; removing → "doch in der Praxis"; a range → one email from the first to the last day added; a range with nothing new → nothing; clearing a range → "doch"; every address gets it (two addresses)
+
 ## Phase D — Go-live
 - [ ] **T19 Import** (Req R22)
   - Blocked by Open Question 1.

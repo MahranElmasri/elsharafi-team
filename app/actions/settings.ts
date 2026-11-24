@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { formatDate } from "@/lib/audit";
 import { groupDays } from "@/lib/grid";
+import { sendAll } from "@/lib/mail";
 import { SWITCHES, TYPE_COLORS, codeFromLabel, type Settings } from "@/lib/settings";
 import { requireUser } from "@/lib/session";
 import { createServerClient } from "@/lib/supabase/server";
@@ -173,7 +174,9 @@ export async function rangeEntry(
       p_type: type,
     });
     if (error) return { error: error.message };
-    return { ok: `${label} ${range}: ${data} ${data === 1 ? "Tag" : "Tage"} entfernt.` };
+    await sendAll(data.emails);
+    const removed = Number(data.removed);
+    return { ok: `${label} ${range}: ${removed} ${removed === 1 ? "Tag" : "Tage"} entfernt.` };
   }
 
   const { data, error } = await supabase.rpc("set_absence_range", {
@@ -183,6 +186,7 @@ export async function rangeEntry(
     p_type: type,
   });
   if (error) return { error: error.message };
+  await sendAll(data.emails);
   const skipped = data.skipped as string[];
   let ok = `${label} ${range}: ${data.added} ${data.added === 1 ? "Tag" : "Tage"} eingetragen.`;
   if (skipped.length)

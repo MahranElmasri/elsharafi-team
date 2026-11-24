@@ -52,8 +52,9 @@ export default async function SettingsPage() {
             Zum Beispiel der Empfang: Diese Adressen erfahren per E-Mail, wer nicht in der Praxis
             ist. Bei einer Krankmeldung sofort, bei Urlaub und anderen Anträgen erst, wenn die
             Praxisleitung sie genehmigt hat, und noch einmal, wenn eine genehmigte Abwesenheit
-            storniert wird. Die E-Mail nennt nur Name und Datum, nie den Grund, und enthält keinen
-            Link zur App.
+            storniert wird. Ebenso, wenn die Praxisleitung in der Übersicht eine Abwesenheit
+            einträgt oder entfernt. Die E-Mail nennt nur Name und Datum, nie den Grund, und enthält
+            keinen Link zur App.
           </p>
           <Recipients emails={(recipients.data ?? []).map((r) => r.email as string)} />
         </section>

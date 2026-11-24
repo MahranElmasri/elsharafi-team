@@ -136,6 +136,8 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
   - WHEN an employee reports sick, at once;
   - WHEN an admin approves a request (vacation or any other type), not before;
   - and "{Name} ist … doch in der Praxis." WHEN an admin cancels an approved leave.
+  - WHEN an admin enters an absence in the overview for a day that had none (grid click, menu or "Zeitraum eintragen"), at once: one email per action, covering the first to the last day entered. Changing the type or half of a day that already has an entry SHALL NOT be sent.
+  - "{Name} ist … doch in der Praxis." WHEN an admin removes an entered absence in the overview (grid or "Zeitraum entfernen"): one email per action, covering the first to the last day removed. IF nothing was entered or removed, nothing SHALL be sent.
   - New requests, withdrawn pending requests and denials SHALL NOT be sent. The email SHALL carry the name and dates only: never the type, the reason or a note, and no link to the app. It is email only, with no in-app notice.
   - IF an address is not a valid email, THE SYSTEM SHALL refuse it with a message. Only admins SHALL be able to read or change the list, and changes SHALL be audit-logged.
 - IF a person has no email address, the email is skipped. IF an email fails, it SHALL be logged and the action SHALL still succeed.
