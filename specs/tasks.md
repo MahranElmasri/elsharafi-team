@@ -48,6 +48,9 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T10b Invite email with steps and QR** (Req R23)
   - Work: `inviteMail()` in `lib/invites.ts` (text + HTML, inline QR PNG); `Mail` gets `html`/`attachments`; `createInviteFor` uses it.
   - Verify: Vitest: username, steps, link, expiry and the QR attachment are in the mail, and names are escaped; one real send to an own address.
+- [x] **T10d Guide attached to the invite email** (Req R23, v1.17)
+  - Work: update `Anleitung/Anleitung-Mitarbeitende.html` to match the app (invite email with username and QR, "Angemeldet bleiben", "Passwort vergessen"); print the PDF; `inviteMail()` attaches it and names it in the steps; `outputFileTracingIncludes` in `next.config.ts`.
+  - Verify: Vitest: the PDF attachment is in the mail and the text mentions it; without the file the mail still builds.
 - [x] **T10c Shorter passwords** (Req R23)
   - Work: minimum 6 characters (was 10) in `SetPasswordForm`, `app/actions/invites.ts`, `lib/labels.ts`, `scripts/create-admin.mjs`; Supabase `minimum_password_length = 6`, no `password_requirements`.
   - Verify: typecheck, Vitest and Prettier pass.

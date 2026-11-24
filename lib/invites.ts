@@ -1,4 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import QRCode from "qrcode";
 import { labels } from "@/lib/labels";
 import type { Mail } from "@/lib/mail";
@@ -41,9 +43,23 @@ function escapeHtml(value: string): string {
     .replace(/'/g, "&#39;");
 }
 
+/** Shipped with the server bundle through `outputFileTracingIncludes` in `next.config.ts`. */
+export const GUIDE_FILE = path.join(process.cwd(), "Anleitung", "Anleitung-Mitarbeitende.pdf");
+
+/** The employee guide (R23), or null when it can't be read: the invite still goes out without it. */
+async function readGuide(file: string): Promise<Buffer | null> {
+  try {
+    return await readFile(file);
+  } catch (err) {
+    console.error(`[mail] Anleitung nicht lesbar, Einladung ohne Anhang: ${file}`, err);
+    return null;
+  }
+}
+
 /**
  * The invite email (R23): username, steps, link and QR code, as text and HTML.
  * The QR code is an inline PNG, because Gmail and Outlook block `data:` images.
+ * The employee guide is attached as a PDF and named in the steps when it can be read.
  */
 export async function inviteMail(invite: {
   to: string;
@@ -51,7 +67,7 @@ export async function inviteMail(invite: {
   username: string;
   url: string;
   expiresAt: string;
-}): Promise<Mail> {
+}, guideFile = GUIDE_FILE): Promise<Mail> {
   const M = labels.employees.inviteMail;
   const loginUrl = `${appUrl()}/login`;
   const until = new Date(invite.expiresAt).toLocaleString("de-DE", {
@@ -59,7 +75,8 @@ export async function inviteMail(invite: {
     timeStyle: "short",
     timeZone: "Europe/Berlin",
   });
-  const steps = M.steps(loginUrl);
+  const guide = await readGuide(guideFile);
+  const steps = guide ? [...M.steps(loginUrl), M.guide] : M.steps(loginUrl);
 
   const text = [
     M.greeting(invite.name),
@@ -105,6 +122,11 @@ export async function inviteMail(invite: {
     subject: M.subject,
     text,
     html,
-    attachments: [{ filename: "einladung-qr.png", content: qr, cid: "invite-qr" }],
+    attachments: [
+      { filename: "einladung-qr.png", content: qr, cid: "invite-qr" },
+      ...(guide
+        ? [{ filename: "Anleitung-Mitarbeitende.pdf", content: guide, contentType: "application/pdf" }]
+        : []),
+    ],
   };
 }

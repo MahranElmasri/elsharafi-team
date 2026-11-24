@@ -111,6 +111,8 @@ export const labels = {
         "Klicken Sie auf „Passwort speichern“. Sie sind dann angemeldet.",
         `Künftig melden Sie sich unter ${loginUrl} mit Ihrem Benutzernamen und diesem Passwort an.`,
       ],
+      guide:
+        "Die Anleitung im Anhang zeigt Schritt für Schritt, wie Sie Urlaub beantragen und sich krank melden.",
       button: "Passwort festlegen",
       link: "Link zum Passwort:",
       qr: "Oder mit dem Handy scannen:",

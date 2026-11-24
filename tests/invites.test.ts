@@ -56,4 +56,22 @@ describe("inviteMail", () => {
     expect(qr.cid).toBe("invite-qr");
     expect(qr.content.subarray(1, 4).toString()).toBe("PNG");
   });
+
+  it("attaches the employee guide as a PDF and names it in the steps", async () => {
+    const { inviteMail } = await import("@/lib/invites");
+    const mail = await inviteMail(invite);
+    const guide = (mail.attachments as { filename: string; content: Buffer }[]).find(
+      (a) => a.filename === "Anleitung-Mitarbeitende.pdf",
+    );
+    expect(guide?.content.subarray(0, 5).toString()).toBe("%PDF-");
+    expect(mail.text).toContain("5. Die Anleitung im Anhang");
+    expect(mail.html).toContain("Die Anleitung im Anhang");
+  });
+
+  it("still builds without the guide when the file is missing", async () => {
+    const { inviteMail } = await import("@/lib/invites");
+    const mail = await inviteMail(invite, "/nonexistent/Anleitung.pdf");
+    expect(mail.attachments).toHaveLength(1);
+    expect(mail.text).not.toContain("Anleitung");
+  });
 });

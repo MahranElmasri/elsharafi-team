@@ -1,5 +1,5 @@
 # PRD — MVZ El-Sharafi: Anwesenheit & Urlaub
-**Version:** 1.16 · **Date:** 2026-11-23 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
+**Version:** 1.17 · **Date:** 2026-11-24 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
 
 | Document | Contents |
 |---|---|
@@ -47,7 +47,7 @@ One online app where:
 ## 4a. First login & forgotten password
 1. The admin creates the employee (name, username, optional email, team, …).
 2. The admin clicks **"Einladung erstellen"**, which makes a one-time link valid for 7 days:
-   - **Employee has an email:** the link is emailed automatically. The email shows the username, the steps to set the password, a button with the link, and the same QR code, so it can be opened on the phone by scanning it from the computer screen.
+   - **Employee has an email:** the link is emailed automatically. The email shows the username, the steps to set the password, a button with the link, and the same QR code, so it can be opened on the phone by scanning it from the computer screen. The employee guide (`Anleitung/Anleitung-Mitarbeitende.pdf`: set password, log in, install the app, request leave, report sick) is attached as a PDF.
    - **No email:** the screen shows the link plus a QR code to print, scan from the admin's screen, or forward on WhatsApp.
 3. The employee opens the link and sets their own password (at least 6 characters (letters or digits, no other rules), entered twice). They are then logged in, and the link stops working.
 4. From then on they log in with **username + password**. The admin never sets or sees a password.
@@ -110,4 +110,5 @@ Print view, blackout periods, a second language, approval for sick days, rotatin
 | 1.14 | 2026-11-18 | Team calendar shows the date (weekday and day number) above each day column |
 | 1.15 | 2026-11-18 | Einstellungen: email recipients for the reception, told who is not in the practice (name and dates only, no reason, no app link): at once for a sick report, for leave once the admin approves it, and when an approved leave is cancelled |
 | 1.16 | 2026-11-23 | Login: "Angemeldet bleiben" box (on by default). Off, the session ends when the browser closes, for shared PCs such as the reception. The browser's password manager can save and fill username and password |
+| 1.17 | 2026-11-24 | Invite email: the employee guide is attached as a PDF. The guide is brought in line with the app (invite email with QR code, "Angemeldet bleiben", "Passwort vergessen" link) |
 
