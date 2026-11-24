@@ -1,5 +1,5 @@
 # PRD — MVZ El-Sharafi: Anwesenheit & Urlaub
-**Version:** 1.17 · **Date:** 2026-11-24 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
+**Version:** 1.18 · **Date:** 2026-11-24 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
 
 | Document | Contents |
 |---|---|
@@ -111,4 +111,5 @@ Print view, blackout periods, a second language, approval for sick days, rotatin
 | 1.15 | 2026-11-18 | Einstellungen: email recipients for the reception, told who is not in the practice (name and dates only, no reason, no app link): at once for a sick report, for leave once the admin approves it, and when an approved leave is cancelled |
 | 1.16 | 2026-11-23 | Login: "Angemeldet bleiben" box (on by default). Off, the session ends when the browser closes, for shared PCs such as the reception. The browser's password manager can save and fill username and password |
 | 1.17 | 2026-11-24 | Invite email: the employee guide is attached as a PDF. The guide is brought in line with the app (invite email with QR code, "Angemeldet bleiben", "Passwort vergessen" link) |
+| 1.18 | 2026-11-24 | Admin guide `Anleitung/Anleitung-Praxisleitung.html` (+ PDF): every admin function step by step, with screenshots of demo data only |
 

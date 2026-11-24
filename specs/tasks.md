@@ -51,6 +51,9 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T10d Guide attached to the invite email** (Req R23, v1.17)
   - Work: update `Anleitung/Anleitung-Mitarbeitende.html` to match the app (invite email with username and QR, "Angemeldet bleiben", "Passwort vergessen"); print the PDF; `inviteMail()` attaches it and names it in the steps; `outputFileTracingIncludes` in `next.config.ts`.
   - Verify: Vitest: the PDF attachment is in the mail and the text mentions it; without the file the mail still builds.
+- [x] **T10e Admin guide** (v1.18; covers R2, R10, R12, R13, R17, R19, R21, R23–R26)
+  - Work: `Anleitung/Anleitung-Praxisleitung.html` in the style of the employee guide, printed to PDF; screenshots taken from the local app with throwaway demo accounts and demo data (real names and addresses replaced), removed afterwards.
+  - Verify: every step names a button or field that exists in the app; no real name or address in any screenshot; all slides fit 1280 × 720.
 - [x] **T10c Shorter passwords** (Req R23)
   - Work: minimum 6 characters (was 10) in `SetPasswordForm`, `app/actions/invites.ts`, `lib/labels.ts`, `scripts/create-admin.mjs`; Supabase `minimum_password_length = 6`, no `password_requirements`.
   - Verify: typecheck, Vitest and Prettier pass.
