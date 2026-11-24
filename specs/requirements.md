@@ -136,6 +136,8 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
   - WHEN an employee reports sick, at once;
   - WHEN an admin approves a request (vacation or any other type), not before;
   - and "{Name} ist … doch in der Praxis." WHEN an admin cancels an approved leave.
+  - WHEN an admin enters an absence in the overview for a day that had none (grid click, menu or "Zeitraum eintragen"), at once: one email per action, covering the first to the last day entered. Changing the type or half of a day that already has an entry SHALL NOT be sent.
+  - "{Name} ist … doch in der Praxis." WHEN an admin removes an entered absence in the overview (grid or "Zeitraum entfernen"): one email per action, covering the first to the last day removed. IF nothing was entered or removed, nothing SHALL be sent.
   - New requests, withdrawn pending requests and denials SHALL NOT be sent. The email SHALL carry the name and dates only: never the type, the reason or a note, and no link to the app. It is email only, with no in-app notice.
   - IF an address is not a valid email, THE SYSTEM SHALL refuse it with a message. Only admins SHALL be able to read or change the list, and changes SHALL be audit-logged.
 - IF a person has no email address, the email is skipped. IF an email fails, it SHALL be logged and the action SHALL still succeed.
@@ -164,6 +166,7 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 - WHEN an admin clicks "Einladung erstellen", THE SYSTEM SHALL create a single-use link valid for 7 days. Any older unused link for that person SHALL stop working.
 - IF the person has an email, THE SYSTEM SHALL email the link. In every case it SHALL show the link plus a QR code to print, scan or share.
 - The invite email SHALL contain the person's username, the steps to set the password (open the link or scan the QR code, enter a password of at least 6 characters (letters or digits, no other rules) twice, save, then log in with username and password), the link, the QR code of the link, and when the link expires. It SHALL also be readable as plain text.
+- The invite email SHALL attach the employee guide `Anleitung-Mitarbeitende.pdf` (set password, log in, install the app, request leave, report sick) and say so in the text. IF the file can't be read, THE SYSTEM SHALL still send the email without it.
 - WHEN the link is opened, THE SYSTEM SHALL ask for a new password (at least 6 characters (letters or digits, no other rules), entered twice), save it, sign the person in, and mark the link used.
 - Every password field (login, set password) SHALL have an eye button. WHEN it is clicked, THE SYSTEM SHALL show the typed password as text; a second click SHALL hide it again. The button SHALL be keyboard-reachable and announce its state.
 - IF the link is used, expired, or belongs to a deactivated account, THE SYSTEM SHALL refuse it with a German message.
@@ -237,3 +240,4 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 - **v1.7 (2026-11-17):** R23: an eye button on each password field shows or hides the password.
 - **v1.8 (2026-11-17):** R7, R8, R18: the substitute is notified on approval (not on request) and on cancellation of an approved request; a sick report can name a substitute.
 - **v1.9 (2026-11-23):** R1: "Angemeldet bleiben" box; the browser can save the login.
+- **v1.10 (2026-11-24):** R23: the invite email attaches the employee guide as a PDF.

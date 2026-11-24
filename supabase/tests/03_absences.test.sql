@@ -28,13 +28,13 @@ select throws_ok($$select set_absence('00000000-0000-0000-0000-0000000000b2', '2
   'P0001', 'Der 25.12.2026 ist ein Feiertag. An Feiertagen wird nichts eingetragen.', 'a holiday is refused');
 
 -- Grid click cycle: X, then U on the same day, then removed
-select is((select status from set_absence('00000000-0000-0000-0000-0000000000b2', '2026-11-10', 'sick')),
+select is(set_absence('00000000-0000-0000-0000-0000000000b2', '2026-11-10', 'sick') -> 'day' ->> 'status',
   'approved', 'the admin enters X, approved directly');
-select is((select type from set_absence('00000000-0000-0000-0000-0000000000b2', '2026-11-10', 'vacation')),
+select is(set_absence('00000000-0000-0000-0000-0000000000b2', '2026-11-10', 'vacation') -> 'day' ->> 'type',
   'vacation', 'clicking again turns it into U');
 select is((select count(*)::int from absence_days where user_id = '00000000-0000-0000-0000-0000000000b2'),
   1, 'still one entry for that day');
-select is((select amount from set_absence('00000000-0000-0000-0000-0000000000b2', '2026-11-12', 'vacation', 'am')),
+select is((set_absence('00000000-0000-0000-0000-0000000000b2', '2026-11-12', 'vacation', 'am') -> 'day' ->> 'amount')::numeric,
   0.5::numeric, 'a half day counts 0.5');
 select lives_ok($$select set_absence('00000000-0000-0000-0000-0000000000b2', '2026-11-12', null)$$, 'removing works');
 select is((select count(*)::int from absence_days where day = '2026-11-12'), 0, 'the entry is gone');

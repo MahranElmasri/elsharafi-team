@@ -63,7 +63,7 @@ insert into r values ('ez', set_absence_range('00000000-0000-0000-0000-000000000
 select is((select (v ->> 'added')::int from r where k = 'ez'), 16,
   'December: 18 Mon/Tue/Thu/Fri minus 25.12. and the existing sick day = 16');
 select is((select v -> 'skipped' ->> 0 from r where k = 'ez'), '2026-12-07', 'the sick day is skipped and listed');
-select is(clear_absence_range('00000000-0000-0000-0000-000000000103', '2026-12-01', '2026-12-31', 'parental'), 16,
+select is((clear_absence_range('00000000-0000-0000-0000-000000000103', '2026-12-01', '2026-12-31', 'parental') ->> 'removed')::int, 16,
   'the range can be removed again');
 select is((select count(*)::int from absence_days where user_id = '00000000-0000-0000-0000-000000000103'), 1,
   'only the sick day remains');

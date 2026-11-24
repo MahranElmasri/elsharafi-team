@@ -48,6 +48,12 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T10b Invite email with steps and QR** (Req R23)
   - Work: `inviteMail()` in `lib/invites.ts` (text + HTML, inline QR PNG); `Mail` gets `html`/`attachments`; `createInviteFor` uses it.
   - Verify: Vitest: username, steps, link, expiry and the QR attachment are in the mail, and names are escaped; one real send to an own address.
+- [x] **T10d Guide attached to the invite email** (Req R23, v1.17)
+  - Work: update `Anleitung/Anleitung-Mitarbeitende.html` to match the app (invite email with username and QR, "Angemeldet bleiben", "Passwort vergessen"); print the PDF; `inviteMail()` attaches it and names it in the steps; `outputFileTracingIncludes` in `next.config.ts`.
+  - Verify: Vitest: the PDF attachment is in the mail and the text mentions it; without the file the mail still builds.
+- [x] **T10e Admin guide** (v1.18; covers R2, R10, R12, R13, R17, R19, R21, R23–R26)
+  - Work: `Anleitung/Anleitung-Praxisleitung.html` in the style of the employee guide, printed to PDF; screenshots taken from the local app with throwaway demo accounts and demo data (real names and addresses replaced), removed afterwards.
+  - Verify: every step names a button or field that exists in the app; no real name or address in any screenshot; all slides fit 1280 × 720.
 - [x] **T10c Shorter passwords** (Req R23)
   - Work: minimum 6 characters (was 10) in `SetPasswordForm`, `app/actions/invites.ts`, `lib/labels.ts`, `scripts/create-admin.mjs`; Supabase `minimum_password_length = 6`, no `password_requirements`.
   - Verify: typecheck, Vitest and Prettier pass.
@@ -112,6 +118,10 @@ Each task gets tests first and is ticked off when done. Each one touches at most
 - [x] **T17h Angemeldet bleiben** (Req R1, v1.16)
   - Work: `lib/supabase/session-cookie.ts` (`sessionCookie()`, cookie name); `createServerClient` and `updateSession` use it; `login` sets or deletes `nur-sitzung`; checkbox in `LoginForm`, label in `lib/labels.ts`.
   - Verify: Vitest: `sessionCookie()` drops `maxAge`/`expires` only for a session-only login and never for a deletion. e2e: unchecked login gives auth cookies with no expiry; checked login gives a persistent one; existing auth specs pass
+
+- [x] **T17i Reception emails for overview entries** (Req R18, v1.19)
+  - Work: migration `20261124120000_reception_grid.sql`: `set_absence` (now returns jsonb `{day, emails}`), `set_absence_range` (adds `emails`) and `clear_absence_range` (now returns jsonb `{removed, emails}`) call `reception_notice` for the days actually added or removed; `setCell` and `saveRange` send the emails; the "E-Mail-Empfänger" text on Einstellungen names the overview; pgTAP `03_absences` and `08_types_ranges` adjusted to the jsonb returns.
+  - Verify: pgTAP: a new grid day → "nicht in der Praxis" for that day; a type change → nothing; removing → "doch in der Praxis"; a range → one email from the first to the last day added; a range with nothing new → nothing; clearing a range → "doch"; every address gets it (two addresses)
 
 ## Phase D — Go-live
 - [ ] **T19 Import** (Req R22)

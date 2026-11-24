@@ -1,5 +1,6 @@
 "use server";
 
+import { sendAll } from "@/lib/mail";
 import { requireUser } from "@/lib/session";
 import { createServerClient } from "@/lib/supabase/server";
 
@@ -24,13 +25,16 @@ export async function setCell(
   await requireUser("admin");
   if (invalid(user, day)) return { error: "Ungültiger Tag." };
   const supabase = await createServerClient();
-  const { error } = await supabase.rpc("set_absence", {
+  const { data, error } = await supabase.rpc("set_absence", {
     p_user: user,
     p_day: day,
     p_type: type,
     p_half: half,
   });
-  return error ? { error: error.message } : {};
+  if (error) return { error: error.message };
+  // The reception hears of a new or removed day (R18).
+  await sendAll(data.emails);
+  return {};
 }
 
 export async function saveNote(user: string, day: string, note: string): Promise<GridResult> {
