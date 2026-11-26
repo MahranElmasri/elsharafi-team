@@ -86,6 +86,8 @@ export const labels = {
     suggest: "Vorschlag berechnen",
     suggested: (days: string) => `Vorschlag: ${days} Tage`,
     take: "Übernehmen",
+    liveSuggestion: (year: number, days: string, fullTime: number) =>
+      `Vorschlag Urlaubsanspruch ${year}: ${days} Tage (bei ${fullTime} Tagen Vollzeit, § 5 BUrlG)`,
     fullTimeInvalid: "Bitte geben Sie den Vollzeit-Anspruch in Tagen ein.",
     login: "Anmeldung",
     loginHint:

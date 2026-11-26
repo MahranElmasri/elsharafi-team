@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { authEmail, parseDays, parseEmployeeForm } from "@/lib/employees";
+import { authEmail, parseDays, parseEmployeeForm, suggestedAllowance } from "@/lib/employees";
 
 function form(fields: Record<string, string | string[]>) {
   const f = new FormData();
@@ -65,5 +65,30 @@ describe("helpers", () => {
     expect(parseDays("2.3")).toBeNull();
     expect(parseDays("-1")).toBeNull();
     expect(parseDays("")).toBeNull();
+  });
+});
+
+describe("suggestedAllowance (§5 BUrlG, R13)", () => {
+  it("scales 30 full-time days by workdays for a full year", () => {
+    expect([5, 4, 3, 2, 1].map((n) => suggestedAllowance(n, "2020-01-01", null, 2026))).toEqual([
+      30, 24, 18, 12, 6,
+    ]);
+  });
+  it("counts only full months employed (same cases as pgTAP 04_balances)", () => {
+    expect(suggestedAllowance(3, "2026-07-01", null, 2026)).toBe(9);
+    expect(suggestedAllowance(5, "2020-01-01", "2026-03-31", 2026)).toBe(8);
+    expect(suggestedAllowance(4, "2026-07-01", null, 2026)).toBe(12);
+    expect(suggestedAllowance(5, "2026-01-15", null, 2026)).toBe(28); // 11 months: 27.5
+    expect(suggestedAllowance(5, "2026-01-01", "2026-06-29", 2026)).toBe(13); // 5 months: 12.5
+  });
+  it("rounds up from .5, otherwise keeps one decimal", () => {
+    expect(suggestedAllowance(3, "2026-06-01", null, 2026)).toBe(11); // 10.5
+    expect(suggestedAllowance(1, "2026-03-01", null, 2026)).toBe(5); // 5.0
+    expect(suggestedAllowance(1, "2026-08-01", null, 2026)).toBe(3); // 2.5
+    expect(suggestedAllowance(2, "2026-02-01", null, 2026)).toBe(11); // 11.0
+    expect(suggestedAllowance(1, "2020-01-01", null, 2026, 26)).toBe(5.2); // 5.2
+  });
+  it("is 0 outside the employment", () => {
+    expect(suggestedAllowance(5, "2027-01-01", null, 2026)).toBe(0);
   });
 });

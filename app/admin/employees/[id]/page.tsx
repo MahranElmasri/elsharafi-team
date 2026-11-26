@@ -120,6 +120,7 @@ export default async function EmployeePage({
             teams={teams ?? []}
             submitLabel={L.save}
             pendingLabel={L.saving}
+            suggestionYear={year}
             initial={{
               fullName: person.full_name,
               username: person.username,
