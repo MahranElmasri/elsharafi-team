@@ -123,6 +123,10 @@ Each task gets tests first and is ticked off when done. Each one touches at most
   - Work: migration `20261124120000_reception_grid.sql`: `set_absence` (now returns jsonb `{day, emails}`), `set_absence_range` (adds `emails`) and `clear_absence_range` (now returns jsonb `{removed, emails}`) call `reception_notice` for the days actually added or removed; `setCell` and `saveRange` send the emails; the "E-Mail-Empfänger" text on Einstellungen names the overview; pgTAP `03_absences` and `08_types_ranges` adjusted to the jsonb returns.
   - Verify: pgTAP: a new grid day → "nicht in der Praxis" for that day; a type change → nothing; removing → "doch in der Praxis"; a range → one email from the first to the last day added; a range with nothing new → nothing; clearing a range → "doch"; every address gets it (two addresses)
 
+- [x] **T17j Live allowance suggestion** (Req R13, v1.20)
+  - Work: `suggestedAllowance()` in `lib/employees.ts` (same rule as SQL `suggested_allowance`); `EmployeeForm` takes `suggestionYear` and shows "Vorschlag Urlaubsanspruch {Jahr}: n Tage" under the working days, updated on every change; the profile page passes its `?jahr` year; the new-employee form shows nothing.
+  - Verify: Vitest: 5→30 … 1→6 for a full year; the pgTAP cases (1.7. joiner, 3 days → 9; 31.3. leaver → 8); one decimal below .5. e2e: on a profile, picking 4 days shows 24, a 1.7. start shows 12; the new-employee form has no suggestion
+
 ## Phase D — Go-live
 - [ ] **T19 Import** (Req R22)
   - Blocked by Open Question 1.

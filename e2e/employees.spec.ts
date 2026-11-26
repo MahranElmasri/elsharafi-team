@@ -154,3 +154,25 @@ test("the allowance takes the §5 BUrlG suggestion", async ({ page }) => {
     .single();
   expect(Number(data?.days)).toBe(9);
 });
+
+test("the profile suggests the allowance live while workdays are picked (R13)", async ({
+  page,
+}) => {
+  await logInAdmin(page);
+  await page.goto("/admin/employees");
+  await expect(page.getByText(/Vorschlag Urlaubsanspruch/)).toHaveCount(0);
+
+  await admin
+    .from("profiles")
+    .update({ workdays: [1, 2, 3, 4, 5], start_date: "2020-01-01" })
+    .eq("id", withEntries.id);
+  await page.goto(`/admin/employees/${withEntries.id}?jahr=2026`);
+  await page.waitForLoadState("networkidle");
+  const line = page.getByText(/^Vorschlag Urlaubsanspruch 2026:/);
+  await expect(line).toHaveText(/: 30 Tage/);
+
+  await page.locator("label", { hasText: /^Fr$/ }).click();
+  await expect(line).toHaveText(/: 24 Tage/);
+  await page.getByLabel("Eintritt").fill("2026-07-01");
+  await expect(line).toHaveText(/: 12 Tage/);
+});
