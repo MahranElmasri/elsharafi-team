@@ -1,5 +1,5 @@
 /** Server-side parsing of the employee form. Rules about people live in SQL. */
-// Exception: suggestedAllowance mirrors SQL suggested_allowance for the profile's live display (R13).
+// Exception: fullYearAllowance, the profile's live full-year suggestion (R13).
 
 export type Role = "admin" | "employee";
 export const TEAMS = ["arbeiter", "aerzte", "verwaltung"] as const;
@@ -84,24 +84,7 @@ export function parseDays(raw: FormDataEntryValue | null): number | null {
 /** Full-time vacation days at the practice (the profile's live suggestion). */
 export const FULL_TIME_DAYS = 30;
 
-/**
- * §5 BUrlG suggestion (R13): full time × workdays ÷ 5 × full months employed ÷ 12,
- * rounded up from .5, else to one decimal. Same rule as SQL `suggested_allowance`.
- * Dates are ISO strings (YYYY-MM-DD).
- */
-export function suggestedAllowance(
-  workdayCount: number,
-  startDate: string,
-  endDate: string | null,
-  year: number,
-  fullTime = FULL_TIME_DAYS,
-): number {
-  let months = 0;
-  for (let m = 1; m <= 12; m++) {
-    const first = `${year}-${String(m).padStart(2, "0")}-01`;
-    const last = new Date(Date.UTC(year, m, 0)).toISOString().slice(0, 10);
-    if (startDate <= first && (!endDate || endDate >= last)) months++;
-  }
-  const x = (fullTime * workdayCount * months) / 60; // one division: no float drift at .5
-  return x - Math.floor(x) >= 0.5 ? Math.ceil(x) : Math.round(x * 10) / 10;
+/** Full-year allowance (R13): 30 × working days per week ÷ 5. */
+export function fullYearAllowance(workdayCount: number): number {
+  return (FULL_TIME_DAYS * workdayCount) / 5;
 }

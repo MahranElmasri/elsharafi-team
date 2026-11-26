@@ -106,7 +106,7 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 ### R13 Pro-rata allowance
 - THE SYSTEM SHALL suggest an allowance following §5 BUrlG. It scales the full-time days by working days per week (÷ 5) and by the full months employed in that year (÷ 12), rounding up when the fraction is ≥ 0.5.
 - The admin confirms the value.
-- WHEN the admin selects working days or changes the start/end date in an employee's profile, THE SYSTEM SHALL show the suggested allowance for the year shown on that page at once (full time 30 days), without saving it.
+- WHEN the admin selects working days in an employee's profile, THE SYSTEM SHALL show the full-year allowance 30 × working days ÷ 5 at once (5→30, 4→24, 3→18, 2→12, 1→6), independent of the start/end date, without saving it.
 
 ### R14 Carry-over expiry
 - Vacation days taken up to 31.3. SHALL use up carry-over first. Anything still unused SHALL expire after 31.3.

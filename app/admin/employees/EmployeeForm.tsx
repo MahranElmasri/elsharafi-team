@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import type { ActionState } from "@/app/actions/employees";
 import { FormMessage } from "@/components/FormMessage";
-import { FULL_TIME_DAYS, suggestedAllowance, WEEKDAYS } from "@/lib/employees";
+import { FULL_TIME_DAYS, fullYearAllowance, WEEKDAYS } from "@/lib/employees";
 import { labels } from "@/lib/labels";
 
 const L = labels.employees;
@@ -25,42 +25,28 @@ export function EmployeeForm({
   initial,
   submitLabel,
   pendingLabel,
-  suggestionYear,
+  showSuggestion = false,
 }: {
   action: (prev: ActionState, form: FormData) => Promise<ActionState>;
   teams: { id: string; name: string }[];
   initial: EmployeeValues;
   submitLabel: string;
   pendingLabel: string;
-  /** Profile only (R13): show the §5 BUrlG allowance for this year live under the workdays. */
-  suggestionYear?: number;
+  /** Profile only (R13): show the full-year allowance live under the workdays. */
+  showSuggestion?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(action, {});
-  const saved = {
-    workdays: initial.workdays.length,
-    start: initial.startDate,
-    end: initial.endDate,
-  };
-  const [plan, setPlan] = useState(saved);
-  const suggestion =
-    suggestionYear !== undefined && plan.workdays > 0 && plan.start
-      ? suggestedAllowance(plan.workdays, plan.start, plan.end || null, suggestionYear)
-      : null;
+  const [workdayCount, setWorkdayCount] = useState(initial.workdays.length);
 
   return (
     <form
       action={formAction}
       onChange={(e) => {
-        if (suggestionYear === undefined) return;
-        const f = new FormData(e.currentTarget);
-        setPlan({
-          workdays: f.getAll("workdays").length,
-          start: String(f.get("startDate") ?? ""),
-          end: String(f.get("endDate") ?? ""),
-        });
+        if (showSuggestion)
+          setWorkdayCount(new FormData(e.currentTarget).getAll("workdays").length);
       }}
       // React resets the fields to `initial` after the action; follow suit.
-      onReset={() => setPlan(saved)}
+      onReset={() => setWorkdayCount(initial.workdays.length)}
       className="grid gap-5"
     >
       <div className="grid gap-5 sm:grid-cols-2">
@@ -117,10 +103,10 @@ export function EmployeeForm({
             </label>
           ))}
         </div>
-        {suggestionYear !== undefined && (
+        {showSuggestion && (
           <p aria-live="polite" className="text-sm text-pencil">
-            {suggestion !== null &&
-              L.liveSuggestion(suggestionYear, suggestion.toLocaleString("de-DE"), FULL_TIME_DAYS)}
+            {workdayCount > 0 &&
+              L.liveSuggestion(fullYearAllowance(workdayCount), workdayCount, FULL_TIME_DAYS)}
           </p>
         )}
       </fieldset>
