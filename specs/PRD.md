@@ -1,5 +1,5 @@
 # PRD — MVZ El-Sharafi: Anwesenheit & Urlaub
-**Version:** 1.20 · **Date:** 2026-11-26 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
+**Version:** 1.21 · **Date:** 2026-11-26 · **Status:** Draft, awaiting approval · **Owner:** MVZ El-Sharafi practice management
 
 | Document | Contents |
 |---|---|
@@ -37,12 +37,12 @@ One online app where:
 | Correct counting | Part-time weekdays, Berlin holidays, closure days | R5, R6, R16 |
 | Requests | Request with substitute → pending → approve/deny/cancel; direct sick report | R7–R9 |
 | Team awareness | Same-category conflicts, staffing limit per category, team calendar showing only "abwesend" | R10, R11 |
-| Balances & law | Balances, pro-rata allowance (§5 BUrlG, shown live when working days are picked in an employee profile), carry-over expiry 31.3., reminders (BAG employer notice) with log, AU tracking (§5 EFZG) | R12–R15, R17 |
+| Balances & law | Balances, pro-rata allowance (§5 BUrlG, full-year value 30 × working days ÷ 5 shown live when working days are picked in an employee profile), carry-over expiry 31.3., reminders (BAG employer notice) with log, AU tracking (§5 EFZG) | R12–R15, R17 |
 | Notifications | Live bell + SMTP email; the open page (grid, request count, calendar) updates when a notification arrives | R18 |
 | Mobile app (PWA) | Installable on the phone's home screen (opens full screen); push notifications on the phone, also when the app is closed, after opting in per device | R27 |
 | Privacy | Audit log, 3-year deletion of health data, sick details visible to admins only | R20 |
 | Data | Excel export, JSON backup, one-time import of 2026 from PraxisPlan | R21, R22 |
-| Settings | Admin page "Einstellungen" with on/off switches for team calendar, half days, substitute, AU tracking, and email recipients (e.g. the reception) told who is absent | R24, R18 |
+| Settings | Admin page "Einstellungen" with on/off switches for team calendar, half days, substitute, AU tracking, vacation reminders (off by default), and email recipients (e.g. the reception) told who is absent | R24, R18 |
 
 ## 4a. First login & forgotten password
 1. The admin creates the employee (name, username, optional email, team, …).
@@ -114,4 +114,6 @@ Print view, blackout periods, a second language, approval for sick days, rotatin
 | 1.18 | 2026-11-24 | Admin guide `Anleitung/Anleitung-Praxisleitung.html` (+ PDF): every admin function step by step, with screenshots of demo data only |
 | 1.19 | 2026-11-24 | Reception emails also when the admin enters an absence in the overview (grid click, menu or "Zeitraum eintragen") and when she removes one, so the reception hears of every absence, not only those reported or requested by the employee |
 | 1.20 | 2026-11-26 | Employee profile: the §5 BUrlG allowance suggestion (30 days full time × working days ÷ 5, pro-rata by full months) appears at once under the working days while the admin selects them; it is not saved, the admin still sets the allowance |
+| 1.21 | 2026-11-26 | The live suggestion in the employee profile shows the full-year value only: 30 × working days ÷ 5 (5→30, 4→24, 3→18, 2→12, 1→6), no longer scaled by months. The "Vorschlag berechnen" box keeps the pro-rata calculation for joiners and leavers |
+| 1.22 | 2026-11-27 | Settings: new switch "Urlaubserinnerungen" turns the R15 reminders (email and in-app) on or off for the whole practice. Off by default, also on the existing installation, until the leave already taken this year is entered |
 

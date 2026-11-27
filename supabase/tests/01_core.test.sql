@@ -1,6 +1,6 @@
 -- T1 Core schema (R1, R3, R19, R24, R25)
 begin;
-select plan(20);
+select plan(21);
 -- The switches can be changed in the app; the tests assume all on (rolled back at the end).
 update public.app_settings set team_calendar = true, half_days = true, substitutes = true, au_tracking = true;
 
@@ -17,6 +17,9 @@ select ok((select bool_and(column_default = 'true') from information_schema.colu
             where table_schema = 'public' and table_name = 'app_settings'
               and column_name in ('team_calendar', 'half_days', 'substitutes', 'au_tracking')),
           'all feature switches start on');
+select ok((select column_default = 'false' from information_schema.columns
+            where table_schema = 'public' and table_name = 'app_settings' and column_name = 'reminders'),
+          'vacation reminders start off');
 
 -- Account trigger
 insert into auth.users (id, email, raw_user_meta_data, raw_app_meta_data) values

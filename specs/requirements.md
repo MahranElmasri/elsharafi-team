@@ -106,7 +106,7 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 ### R13 Pro-rata allowance
 - THE SYSTEM SHALL suggest an allowance following §5 BUrlG. It scales the full-time days by working days per week (÷ 5) and by the full months employed in that year (÷ 12), rounding up when the fraction is ≥ 0.5.
 - The admin confirms the value.
-- WHEN the admin selects working days or changes the start/end date in an employee's profile, THE SYSTEM SHALL show the suggested allowance for the year shown on that page at once (full time 30 days), without saving it.
+- WHEN the admin selects working days in an employee's profile, THE SYSTEM SHALL show the full-year allowance 30 × working days ÷ 5 at once (5→30, 4→24, 3→18, 2→12, 1→6), independent of the start/end date, without saving it.
 
 ### R14 Carry-over expiry
 - Vacation days taken up to 31.3. SHALL use up carry-over first. Anything still unused SHALL expire after 31.3.
@@ -115,6 +115,7 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 - From 1.10., employees with unused days this year SHALL get a monthly reminder.
 - From 1.2., employees with carry-over that expires on 31.3. SHALL get a monthly reminder.
 - Reminders go by email and in-app. Each one SHALL be logged with date and channel.
+- IF the "Urlaubserinnerungen" switch (R24) is off, THE SYSTEM SHALL send no reminder, neither by email nor in-app (v1.22).
 
 ### R16 Closure days
 - An admin SHALL be able to enter a closure range once. THE SYSTEM SHALL add B days for all active employees on their working days.
@@ -174,7 +175,7 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 - WHEN someone clicks "Passwort vergessen" and enters a username, THE SYSTEM SHALL always answer the same way, so nobody can find out which usernames exist. If that account has an email, the system SHALL email a new link, at most 1 per 15 minutes. Without an email, the page says "bitte an die Praxisleitung wenden".
 
 ### R24 Settings (show/hide features)
-- An admin SHALL be able to switch these features on or off for the whole practice: **Team calendar** (R11), **Half days** (R4), **Substitute** (R7), **AU tracking** (R17). All four are on by default.
+- An admin SHALL be able to switch these features on or off for the whole practice: **Team calendar** (R11), **Half days** (R4), **Substitute** (R7), **AU tracking** (R17), **Vacation reminders** (R15). The first four are on by default; vacation reminders are off by default (v1.22).
 - Each switch SHALL be enforced by the database as well as hidden in the UI.
 - Switching a feature off SHALL NOT delete any data. Switching it back on SHALL restore it as it was.
 - Every change to a switch SHALL be audit-logged (R20).

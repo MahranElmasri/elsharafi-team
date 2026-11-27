@@ -127,6 +127,14 @@ Each task gets tests first and is ticked off when done. Each one touches at most
   - Work: `suggestedAllowance()` in `lib/employees.ts` (same rule as SQL `suggested_allowance`); `EmployeeForm` takes `suggestionYear` and shows "Vorschlag Urlaubsanspruch {Jahr}: n Tage" under the working days, updated on every change; the profile page passes its `?jahr` year; the new-employee form shows nothing.
   - Verify: Vitest: 5→30 … 1→6 for a full year; the pgTAP cases (1.7. joiner, 3 days → 9; 31.3. leaver → 8); one decimal below .5. e2e: on a profile, picking 4 days shows 24, a 1.7. start shows 12; the new-employee form has no suggestion
 
+- [x] **T17k Full-year live suggestion** (Req R13, v1.21)
+  - Work: `fullYearAllowance()` replaces `suggestedAllowance()` in `lib/employees.ts`; `EmployeeForm` takes `showSuggestion` and tracks only the number of selected working days; label "Vorschlag Urlaubsanspruch pro Jahr: n Tage (30 × n ÷ 5, § 5 BUrlG)"; the "Vorschlag berechnen" box is unchanged.
+  - Verify: Vitest: 5→30, 4→24, 3→18, 2→12, 1→6. e2e: a profile with Eintritt in late 2026 and 3 days shows 18; removing a day shows 12; the new-employee form has no suggestion
+
+- [x] **T17l Reminders switch** (Req R15, R24, v1.22)
+  - Work: migration `20261127120000_reminders_switch.sql`: `app_settings.reminders boolean not null default false`, the existing row set to false; `due_reminders` returns nothing while it is off. `SWITCHES` in `lib/settings.ts` gets "Urlaubserinnerungen"; e2e setup/teardown include the column.
+  - Verify: pgTAP: the column starts off; with the switch off nothing is due and `run_reminders` returns no email and writes no notification; switched on, the existing cases pass. e2e: the switch on Einstellungen saves and shows the message
+
 ## Phase D — Go-live
 - [ ] **T19 Import** (Req R22)
   - Blocked by Open Question 1.
