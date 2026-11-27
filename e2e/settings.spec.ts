@@ -36,7 +36,13 @@ test.beforeAll(async () => {
 test.afterAll(async () => {
   await admin
     .from("app_settings")
-    .update({ half_days: true, team_calendar: true, substitutes: true, au_tracking: true })
+    .update({
+      half_days: true,
+      team_calendar: true,
+      substitutes: true,
+      au_tracking: true,
+      reminders: true,
+    })
     .eq("id", true);
   await admin.from("absence_days").delete().eq("user_id", ida.id);
   await admin.from("absence_types").delete().eq("label", typeLabel);
@@ -253,4 +259,15 @@ test("an extra email recipient can be added and removed", async ({ page }) => {
   await section.getByRole("button", { name: `${email} entfernen` }).click();
   await expect(section.getByRole("status")).toHaveText(`${email} entfernt.`);
   await expect(section.getByRole("listitem").filter({ hasText: email })).toHaveCount(0);
+});
+
+test("the vacation reminders switch saves on click (R15, R24)", async ({ page }) => {
+  await logIn(page, boss, /\/admin$/);
+  await openSettings(page);
+  const stored = async () =>
+    (await admin.from("app_settings").select("reminders").single()).data?.reminders;
+  await flip(page, "Urlaubserinnerungen", false);
+  expect(await stored()).toBe(false);
+  await flip(page, "Urlaubserinnerungen", true);
+  expect(await stored()).toBe(true);
 });

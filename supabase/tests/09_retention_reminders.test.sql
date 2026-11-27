@@ -1,8 +1,8 @@
 -- T8 Reminders, retention, scheduled jobs (R15, R20)
 begin;
-select plan(19);
+select plan(21);
 -- The switches can be changed in the app; the tests assume all on (rolled back at the end).
-update public.app_settings set team_calendar = true, half_days = true, substitutes = true, au_tracking = true;
+update public.app_settings set team_calendar = true, half_days = true, substitutes = true, au_tracking = true, reminders = true;
 
 -- Start from an empty practice; everything is rolled back at the end, so local data is untouched.
 delete from absence_days; delete from leave_requests; delete from closure_days; delete from audit_log;
@@ -32,6 +32,15 @@ insert into day_notes (user_id, day, note) values ('00000000-0000-0000-0000-0000
 set local role service_role;
 select set_config('request.jwt.claims', '{"role":"service_role"}', true);
 select is((select count(*)::int from due_reminders('2026-09-30')), 0, 'no reminder before 1.10.');
+-- Switch off (R24, v1.22): nobody is due, nothing is written.
+reset role;
+update public.app_settings set reminders = false;
+set local role service_role;
+select is((select jsonb_array_length(run_reminders('2026-10-01'))), 0, 'switch off: run_reminders returns no email');
+select is((select count(*)::int from reminder_log), 0, 'switch off: no reminder is written');
+reset role;
+update public.app_settings set reminders = true;
+set local role service_role;
 select results_eq($$select full_name, kind, days_at_risk from due_reminders('2026-10-01')$$,
   $$values ('Anna', 'year_end', 30::numeric)$$, 'from 1.10.: only people with days left (carry-over expired, Bert used his)');
 select results_eq($$select kind, days_at_risk from due_reminders('2026-02-02')$$,

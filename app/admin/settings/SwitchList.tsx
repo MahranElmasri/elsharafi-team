@@ -6,7 +6,7 @@ import { FormMessage } from "@/components/FormMessage";
 import { Switch } from "@/components/Switch";
 import { SWITCHES, type Settings } from "@/lib/settings";
 
-/** The four practice-wide switches; each saves on click. */
+/** The practice-wide switches; each saves on click. */
 export function SwitchList({ settings }: { settings: Settings }) {
   const [shown, setShown] = useOptimistic(settings);
   const [message, setMessage] = useState<FormState>({});

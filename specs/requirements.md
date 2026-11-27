@@ -115,6 +115,7 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 - From 1.10., employees with unused days this year SHALL get a monthly reminder.
 - From 1.2., employees with carry-over that expires on 31.3. SHALL get a monthly reminder.
 - Reminders go by email and in-app. Each one SHALL be logged with date and channel.
+- IF the "Urlaubserinnerungen" switch (R24) is off, THE SYSTEM SHALL send no reminder, neither by email nor in-app (v1.22).
 
 ### R16 Closure days
 - An admin SHALL be able to enter a closure range once. THE SYSTEM SHALL add B days for all active employees on their working days.
@@ -174,7 +175,7 @@ Each criterion is written as WHEN/IF … THE SYSTEM SHALL …
 - WHEN someone clicks "Passwort vergessen" and enters a username, THE SYSTEM SHALL always answer the same way, so nobody can find out which usernames exist. If that account has an email, the system SHALL email a new link, at most 1 per 15 minutes. Without an email, the page says "bitte an die Praxisleitung wenden".
 
 ### R24 Settings (show/hide features)
-- An admin SHALL be able to switch these features on or off for the whole practice: **Team calendar** (R11), **Half days** (R4), **Substitute** (R7), **AU tracking** (R17). All four are on by default.
+- An admin SHALL be able to switch these features on or off for the whole practice: **Team calendar** (R11), **Half days** (R4), **Substitute** (R7), **AU tracking** (R17), **Vacation reminders** (R15). The first four are on by default; vacation reminders are off by default (v1.22).
 - Each switch SHALL be enforced by the database as well as hidden in the UI.
 - Switching a feature off SHALL NOT delete any data. Switching it back on SHALL restore it as it was.
 - Every change to a switch SHALL be audit-logged (R20).

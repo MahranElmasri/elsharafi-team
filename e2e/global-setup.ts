@@ -10,7 +10,13 @@ export default async function globalSetup() {
   await writeFile(SAVED_SETTINGS, JSON.stringify(data));
   const on = await admin
     .from("app_settings")
-    .update({ team_calendar: true, half_days: true, substitutes: true, au_tracking: true })
+    .update({
+      team_calendar: true,
+      half_days: true,
+      substitutes: true,
+      au_tracking: true,
+      reminders: true,
+    })
     .eq("id", true);
   if (on.error) throw on.error;
 }

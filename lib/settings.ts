@@ -6,6 +6,7 @@ export interface Settings {
   halfDays: boolean;
   substitutes: boolean;
   auTracking: boolean;
+  reminders: boolean;
 }
 
 export const SWITCHES: { key: keyof Settings; column: string; label: string; hint: string }[] = [
@@ -33,6 +34,12 @@ export const SWITCHES: { key: keyof Settings; column: string; label: string; hin
     label: "AU-Nachverfolgung",
     hint: "„AU liegt vor“ abhaken; fehlende AUs nach mehr als 3 Krankheitstagen werden gemeldet.",
   },
+  {
+    key: "reminders",
+    column: "reminders",
+    label: "Urlaubserinnerungen",
+    hint: "Ab 1.10. monatlich an Resturlaub erinnern, ab 1.2. an verfallenden Übertrag (E-Mail und App). Ohne diesen Hinweis verfällt Urlaub nach BAG-Rechtsprechung nicht.",
+  },
 ];
 
 /** The inks a type can be stamped in (CSS variables in globals.css). */
@@ -48,7 +55,7 @@ export const TYPE_COLORS: { value: string; label: string }[] = [
 export async function loadSettings(supabase: SupabaseClient): Promise<Settings> {
   const { data, error } = await supabase
     .from("app_settings")
-    .select("team_calendar, half_days, substitutes, au_tracking")
+    .select("team_calendar, half_days, substitutes, au_tracking, reminders")
     .single();
   if (error) throw new Error(error.message);
   return {
@@ -56,6 +63,7 @@ export async function loadSettings(supabase: SupabaseClient): Promise<Settings> 
     halfDays: data.half_days,
     substitutes: data.substitutes,
     auTracking: data.au_tracking,
+    reminders: data.reminders,
   };
 }
 

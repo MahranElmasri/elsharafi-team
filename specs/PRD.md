@@ -42,7 +42,7 @@ One online app where:
 | Mobile app (PWA) | Installable on the phone's home screen (opens full screen); push notifications on the phone, also when the app is closed, after opting in per device | R27 |
 | Privacy | Audit log, 3-year deletion of health data, sick details visible to admins only | R20 |
 | Data | Excel export, JSON backup, one-time import of 2026 from PraxisPlan | R21, R22 |
-| Settings | Admin page "Einstellungen" with on/off switches for team calendar, half days, substitute, AU tracking, and email recipients (e.g. the reception) told who is absent | R24, R18 |
+| Settings | Admin page "Einstellungen" with on/off switches for team calendar, half days, substitute, AU tracking, vacation reminders (off by default), and email recipients (e.g. the reception) told who is absent | R24, R18 |
 
 ## 4a. First login & forgotten password
 1. The admin creates the employee (name, username, optional email, team, …).
@@ -115,4 +115,5 @@ Print view, blackout periods, a second language, approval for sick days, rotatin
 | 1.19 | 2026-11-24 | Reception emails also when the admin enters an absence in the overview (grid click, menu or "Zeitraum eintragen") and when she removes one, so the reception hears of every absence, not only those reported or requested by the employee |
 | 1.20 | 2026-11-26 | Employee profile: the §5 BUrlG allowance suggestion (30 days full time × working days ÷ 5, pro-rata by full months) appears at once under the working days while the admin selects them; it is not saved, the admin still sets the allowance |
 | 1.21 | 2026-11-26 | The live suggestion in the employee profile shows the full-year value only: 30 × working days ÷ 5 (5→30, 4→24, 3→18, 2→12, 1→6), no longer scaled by months. The "Vorschlag berechnen" box keeps the pro-rata calculation for joiners and leavers |
+| 1.22 | 2026-11-27 | Settings: new switch "Urlaubserinnerungen" turns the R15 reminders (email and in-app) on or off for the whole practice. Off by default, also on the existing installation, until the leave already taken this year is entered |
 
